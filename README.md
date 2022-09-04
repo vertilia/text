@@ -51,27 +51,26 @@ extracted from your sources.
 
 For the above example, you'll have the following translations:
 
-| source (en)                  | target (fr)        |
-|------------------------------|--------------------|
-| "Just a test"                | "Juste un test"    |
-| "Next" (context: "page")     | "Suivante"         |
-| "One page"                   | "Une page"         |
-| "Multiple pages"             | "Plusieures pages" |
-| "One" (context: "page")      | "Une"              |
-| "Multiple" (context: "page") | "Plusieures"       |
+| source (en)                       | target (fr)          |
+|-----------------------------------|----------------------|
+| "Just a test"                     | "Juste un test"      |
+| "Next" (context: "page")          | "Suivante"           |
+| "One page"                        | "Une page"           |
+| "Multiple pages"                  | "Plusieurs pages"    |
+| "One sent" (context: "page")      | "Une envoyée"        |
+| "Multiple sent" (context: "page") | "Plusieurs envoyées" |
 
 Now you will use the `po2php` tool to compile the `locale/fr/messages.po` into a `MessagesFr` class extending
 `\Vertilia\Text\Text` so that in the code you can see the results of your translations:
 
-| method    | code (precondition: `$t = new \App\Locale\MessagesFr();`) | output             |
-|-----------|-----------------------------------------------------------|--------------------|
-| `_()`     | `echo $t->_('Just a test');`                              | `Juste un test`    |
-| `pget()`  | `echo $t->pget('page', 'Next');`                          | `Suivante`         |
-| `nget()`  | `echo $t->nget('One page', 'Multiple pages', 5);`         | `Plusieures pages` |
-| `npget()` | `echo $t->npget('page', 'One', 'Multiple', 5);`           | `Plusieures`       |
+| method    | code (precondition: `$t = new \App\Locale\MessagesFr();`) | output               |
+|-----------|-----------------------------------------------------------|----------------------|
+| `_()`     | `echo $t->_('Just a test');`                              | `Juste un test`      |
+| `pget()`  | `echo $t->pget('page', 'Next');`                          | `Suivante`           |
+| `nget()`  | `echo $t->nget('One page', 'Multiple pages', 5);`         | `Plusieurs pages`    |
+| `npget()` | `echo $t->npget('page', 'One sent', 'Multiple sent', 5);` | `Plusieurs envoyées` |
 
 From now on, your `Text` process will follow the path as described below:
-
 ```mermaid
 graph
     A[Update messages with Text methods] -->|gettext| B(Produce/update .po files)
