@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: vertilia-text-tests\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-31 23:20+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Stas Trefilov <stas.trefilov@gmail.com>\n"
+"Language-Team: Vertilia <stas@vertilia.com>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: TextTest.php:33 TextTest.php:34
+msgid "An apple"
+msgstr "Une pomme"
+
+#: TextTest.php:46 TextTest.php:51
+msgctxt "grass"
+msgid "Green"
+msgstr "Verte"
+
+#: TextTest.php:68 TextTest.php:69
+#, php-format
+msgid "%u line"
+msgid_plural "%u lines"
+msgstr[0] "%u ligne"
+msgstr[1] "%u lignes"
+
+#: TextTest.php:88 TextTest.php:89
+#, php-format
+msgctxt "line"
+msgid "%u sent"
+msgid_plural "%u sent"
+msgstr[0] "%u envoyée"
+msgstr[1] "%u envoyées"
+
+#~ msgid "Next"
+#~ msgstr "Suivant"

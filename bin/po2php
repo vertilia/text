@@ -1,0 +1,234 @@
+#!/usr/bin/php
+<?php
+declare(strict_types=1);
+
+// script usage:
+// vendor/vertilia/text/bin/po2php -c MessagesFr locale/fr/messages.po >src/MessagesFr.php
+
+// set options from command line arguments
+$opts = getopt(
+    'n:c:e:5h',
+    ['namespace:', 'class:', 'extends:', 'php5', 'help'],
+    $OPTIND
+);
+
+if (isset($opts['n']) or isset($opts['namespace'])) {
+    $namespace = sprintf("\nnamespace %s;\n", $opts['n'] ?? $opts['namespace']);
+} else {
+    $namespace = null;
+}
+
+if (isset($opts['c']) or isset($opts['class'])) {
+    $class_name = $opts['c'] ?? $opts['class'];
+} else {
+    $class_name = 'Messages';
+}
+
+if (isset($opts['e']) or isset($opts['extends'])) {
+    $extends = $opts['e'] ?? $opts['extends'];
+} else {
+    $extends = '\\Vertilia\\Text\\Text';
+}
+
+if (isset($opts['5']) or isset($opts['php5'])) {
+    $translations_type = null;
+    $plural_arg_type = null;
+    $plural_return_type = null;
+} else {
+    $translations_type = 'array ';
+    $plural_arg_type = 'int ';
+    $plural_return_type = ': int';
+}
+
+if (isset($opts['h']) or isset($opts['help'])) {
+    exit(sprintf(<<<'EOT'
+Usage: %s OPTIONS locale.po
+where OPTIONS:
+-n, --namespace=NAMESPACE   Namespace to use (default: none)
+-c, --class=CLASS_NAME      Class name (default: Messages)
+-e, --extends=PARENT_CLASS  Parent class name implementing \Vertilia\Text\TextInterface
+                            (default: \Vertilia\Text\Text)
+
+EOT
+        ,
+        basename($argv[0])
+    ));
+}
+
+if (empty($argv[$OPTIND])) {
+    die('Specify as a parameter an existing .PO file to convert' . PHP_EOL);
+}
+
+if (!is_readable($argv[$OPTIND])) {
+    die('File ' . $argv[$OPTIND] . ' does not exist or is not readable' . PHP_EOL);
+}
+
+// where the translations will be stored
+$plurals = null;
+$translations = [];
+
+// global variables
+$mode = '';
+
+$msgctxt = '';
+$msgid = '';
+$msgid_plural = '';
+$msgstr = '';
+
+$last_str = '';
+
+/**
+ * @param string $msgctxt
+ * @param string $msgid
+ * @param string $msgid_plural
+ * @param array|string $msgstr
+ * @return void
+ */
+function store_translation(string $msgctxt, string $msgid, string $msgid_plural, $msgstr): void
+{
+    global $translations;
+
+    eval("\$msgid = \"$msgid\";");
+
+    $id = $msgid;
+
+    if (strlen($msgctxt)) {
+        $id .= "\f$msgctxt";
+    }
+
+    if (is_array($msgstr)) {
+        eval("\$msgid_plural = \"$msgid_plural\";");
+        $id .= "\f$msgid_plural";
+
+        foreach ($msgstr as $n => $str) {
+            $idn = "$id\f$n";
+            $hash = crc32($idn);
+            eval("\$str = \"$str\";");
+
+            if (empty($translations[$hash])) {
+                $translations[$hash] = $str;
+            } elseif (is_array($translations[$hash])) {
+                $translations[$hash][$idn] = $str;
+            } else {
+                $translations[$hash] = [$hash => $translations[$hash], $idn => $str];
+            }
+        }
+    } else {
+        $hash = crc32($id);
+        eval("\$msgstr = \"$msgstr\";");
+
+        if (empty($translations[$hash])) {
+            $translations[$hash] = $msgstr;
+        } elseif (is_array($translations[$hash])) {
+            $translations[$hash][$id] = $msgstr;
+        } else {
+            $translations[$hash] = [$hash => $translations[$hash], $id => $msgstr];
+        }
+    }
+}
+
+/**
+ * @param string $mode
+ * @param string $last_str
+ * @return void
+ */
+function dispatch_last_str(string $mode, string $last_str): void
+{
+    global $msgctxt,
+           $msgid,
+           $msgid_plural,
+           $msgstr;
+
+    switch ($mode) {
+        case 'msgctxt':
+            $msgctxt = $last_str;
+            break;
+        case 'msgid':
+            $msgid = $last_str;
+            break;
+        case 'msgid_plural':
+            $msgid_plural = $last_str;
+            break;
+        case 'msgstr':
+            $msgstr = $last_str;
+            break;
+        default:
+            if (0 === strncmp($mode, 'msgstr', 6)) { // 'msgstr[N]'
+                if (is_array($msgstr)) {
+                    $msgstr[] = $last_str;
+                } else {
+                    $msgstr = [$last_str];
+                }
+            }
+    }
+}
+
+foreach (file($argv[$OPTIND]) as $line) {
+    $line = rtrim($line);
+
+    if (isset($line[0]) and $line[0] == '"') {
+        // continued multiline
+        $last_str .= substr($line, 1, -1);
+    } else {
+        dispatch_last_str($mode, $last_str);
+
+        if (strlen($line) == 0) {
+            // empty line
+            store_translation($msgctxt, $msgid, $msgid_plural, $msgstr);
+            $mode = '';
+            $msgctxt = '';
+            $msgid = '';
+            $msgid_plural = '';
+            $msgstr = '';
+        } elseif ($line[0] != '#'
+            and preg_match('/^([^"]+)"(.*)"$/', $line, $m) // keyword " line "
+        ) {
+            // possible keywords in $m[1]: msgctxt, msgid, msgid_plural, msgstr, msgstr[N]
+
+            $mode = rtrim($m[1]);
+            $last_str = $m[2];
+        }
+    }
+}
+
+if (strlen($msgid)) {
+    dispatch_last_str($mode, $last_str);
+    store_translation($msgctxt, $msgid, $msgid_plural, $msgstr);
+}
+
+if (isset($translations[0])) {
+    if (is_array($translations[0])) {
+        $header = $translations[0][0];
+        unset($translations[0][0]);
+    } else {
+        $header = $translations[0];
+        unset($translations[0]);
+    }
+
+    if (preg_match('/Plural-Forms: .*plural=([^;]+)/', $header, $m)) {
+        $plurals = str_replace('n', '$n', $m[1]);
+    }
+}
+
+printf(
+"<?php
+%s
+class %s extends %s
+{
+    protected %s\$translations = %s;
+
+    protected function plural(%s\$n)%s
+    {
+        return (int)(%s);
+    }
+}
+",
+    $namespace,
+    $class_name,
+    $extends,
+    $translations_type,
+    var_export($translations, true),
+    $plural_arg_type,
+    $plural_return_type,
+    $plurals
+);

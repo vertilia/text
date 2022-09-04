@@ -1,0 +1,28 @@
+{
+  "name": "vertilia/text",
+  "description": "Translations via gettext",
+  "license": "BSD-2-Clause",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Vertilia\\Text\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Vertilia\\Text\\Tests\\Locale\\": "tests/locale/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "7.4"
+    }
+  },
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  }
+}
