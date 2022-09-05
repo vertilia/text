@@ -2,6 +2,8 @@
 
 Translation library based on concept of [gettext](https://www.gnu.org/software/gettext) PO files.
 
+## Description
+
 This class is intended to eliminate the dependency on `gettext` php extension, proved unstable in web environments.
 
 The existing PO catalogue (representing a gettext domain) is transformed by the `po2php` tool to a native `.php` class
@@ -11,12 +13,19 @@ and contains all translated domain messages into target language, and also the p
 Simple messages are maintained via the `_()` method, plural forms and contexts are maintained via corresponding
 `nget()`, `pget()` and `npget()` methods.
 
+## Advantages
+
+- use of standard translation process based on PO files, multitude of editors or processes may be used;
+- translations are stored in `.php` files which allows for a quick autoloading and opcode caching, minimized runtime
+  effort to get translation into memory;
+- stable and predictable work in multiprocess web environments, not tied to currently installed system locales.
+
 ## Usage
 
 Programming in c with gettext historically consists of the following phases (simplified):
 
 1. define the source messages language used in your code (normally english)
-2. use gettext functions in your source code when referencing localized messages
+2. use gettext functions in your source code when using localized messages
    - (without existing translations, gettext functions simply return the passed strings, so the code is already
      working at this stage, returning english messages in all environments)
 3. use gettext command line utilities to scan your code and extract localized messages, producing (or updating) `.po`
@@ -29,27 +38,47 @@ Programming in c with gettext historically consists of the following phases (sim
    arguments
 7. return to 2.
 
-In `Text` we bypass storing translations in compressed binary format to avoid complex operations at runtime, and
-compile `.po` files directly into `.php` classes, containing translated strings and plural forms rules for target
-language.
+In `Text` we bypass phases 5. and 6. that process and handle compressed binary format to avoid complex operations at
+runtime, and compile `.po` files directly into `.php` classes, containing translated strings and plural forms rules for
+target language.
 
-These classes are stored in `locale/` folder and are configured via composer autoloader.
+These generated classes are stored in `locale/` folder and are configured via composer autoloader. They are handled by
+opcode cache just like other php code and use the lowest footprint at runtime since only need one CRC32 transformation
+to return existing translation (or a lack of one).
 
-So now you can use this in your code:
+For large codebases, as with normal gettext, you can break down translations on domains, which mostly signifies using
+different `.po` files per domain.
 
-| method    | code (precondition: `$t = new \Vertilia\Text\Text();`) | output           |
-|-----------|--------------------------------------------------------|------------------|
-| `_()`     | `echo $t->_('Just a test');`                           | `Just a test`    |
-| `pget()`  | `echo $t->pget('page', 'Next');`                       | `Next`           |
-| `nget()`  | `echo $t->nget('One page', 'Multiple pages', 5);`      | `Multiple pages` |
-| `npget()` | `echo $t->npget('page', 'One', 'Multiple', 5);`        | `Multiple`       |
+When you start the project, and while you have no `.po` file yet, you can use the base `\Vertilia\Text\Text` object to
+provide translated text. It will simply return the passes argument as translated message, which is mostly ok for
+debugging purposes. Even in its basic form, it will already be smart enough to correctly handle plural forms for English
+messages.
+
+```php
+<?php
+
+require_once __DIR__ . 'vendor/composer/autoload.php';
+
+$t = new \Vertilia\Text\Text();
+
+echo $t->_('Just a test'), PHP_EOL;                      // output: Just a test
+echo $t->pget('page', 'Next'), PHP_EOL;                  // output: Next
+echo $t->nget('One page', 'Multiple pages', 1), PHP_EOL; // output: One page
+echo $t->nget('One page', 'Multiple pages', 5), PHP_EOL; // output: Multiple pages
+echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Multiple sent
+```
 
 When you process the above code with gettext tools (we highly recommend using widely-available translation tools, like
-[Poedit](https://poedit.net/)) you'll produce a text `messages.po` file with target language translation, say French.
-Your result file will be stored as `locale/fr/messages.po` and will contain French translations for all messages
-extracted from your sources.
+[Poedit](https://poedit.net/) or others) you'll produce a text file with `.po` extension with source language messages
+and placeholders for target language translations, say French. After translating the placeholders in `.po` file, you
+normally include the result file in your project as `locale/fr/LC_MESSAGES/messages.po`. This is a GNU norm, but of
+course you may use any folder and filename. The most important part here is that you (and other users of your codebase)
+could easily locate translation files and clearly distinguish languages and domains.
 
-For the above example, you'll have the following translations:
+> See [Keywords for `xgettext`](#keywords-for-xgettext) below for things to configure when running gettext tools on your
+> codebase.
+
+Simplified view of the contents of `messages.po` file for our project:
 
 | source (en)                       | target (fr)          |
 |-----------------------------------|----------------------|
@@ -59,28 +88,195 @@ For the above example, you'll have the following translations:
 | "Multiple pages"                  | "Plusieurs pages"    |
 | "One sent" (context: "page")      | "Une envoyée"        |
 | "Multiple sent" (context: "page") | "Plusieurs envoyées" |
+| `plural form rule`                | `(n > 1)`            |
 
-Now you will use the `po2php` tool to compile the `locale/fr/messages.po` into a `MessagesFr` class extending
-`\Vertilia\Text\Text` so that in the code you can see the results of your translations:
+Don't forget where you stored the resulting `messages.po` file, since you'll need it right away to produce translations
+class. To do this you'll run the bundled `bin/po2php` command and give it the path to the `messages.po` file. It will
+output the php code that you will include in your project as an easily located `locale/MessagesFr.php` file.
 
-| method    | code (precondition: `$t = new \App\Locale\MessagesFr();`) | output               |
-|-----------|-----------------------------------------------------------|----------------------|
-| `_()`     | `echo $t->_('Just a test');`                              | `Juste un test`      |
-| `pget()`  | `echo $t->pget('page', 'Next');`                          | `Suivante`           |
-| `nget()`  | `echo $t->nget('One page', 'Multiple pages', 5);`         | `Plusieurs pages`    |
-| `npget()` | `echo $t->npget('page', 'One sent', 'Multiple sent', 5);` | `Plusieurs envoyées` |
+So for now, you added 2 additional files to your project:
 
-From now on, your `Text` process will follow the path as described below:
+- `locale/fr/LC_MESSAGES/messages.po`: text file with English source messages from your application code, French
+  translations for every message and a (not so) simple rule that describes the use of plural form(s) in target language,
+  French. You will need this file to update existing translations, add new ones and remove unused ones. This is a
+  standard PO file that you may edit with many available tools. Every translation bureau will handle this format (if it
+  does not, you better choose another one).
+- `locale/MessagesFr.php`: php class that encapsulates translations for target language and a method for handling French
+  plural forms.
+
+Now it's time to use the generated `MessagesFr` class instead of the base `Text` to display your translated messages:
+
+```php
+<?php
+
+require_once __DIR__ . 'vendor/composer/autoload.php';
+
+$t = new \App\Locale\MessagesFr();
+
+echo $t->_('Just a test'), PHP_EOL;                      // output: Juste un test
+echo $t->pget('page', 'Next'), PHP_EOL;                  // output: Suivante
+echo $t->nget('One page', 'Multiple pages', 1), PHP_EOL; // output: Une page
+echo $t->nget('One page', 'Multiple pages', 5), PHP_EOL; // output: Plusieurs pages
+echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Plusieurs envoyées
+```
+
+> See [Proposed configuration for `composer` and `git`](#proposed-configuration-for-composer-and-git) below for sample
+> composer configuration.
+
+Now it's up to you to create translations for other languages. From now on, your localization process with `Text` will
+follow the following path:
 ```mermaid
 graph
-    A[Update messages with Text methods] -->|gettext| B(Produce/update .po files)
-    B -->|po2php| C(Produce/update .php files)
+    A[Update messages with Text methods] -->|gettext| B(Update .po files)
+    B -->|po2php| C(Update .php files)
     C -->|Autoloader| A
 ```
 
+## Process overview
+
+`Vertilia\Text\Text` object contains methods to handle translated messages. Base class does not have translations, so
+its methods simply return passed arguments. When translations are added to `.po` files, they are saved as language
+classes extending `Vertilia\Text\Text` base class with translations and overridden `plural()` method to select
+correct plural forms in target languages.
+
+Normally your code will consist of injecting `Vertilia\Text\TextInterface` objects, creating messages and work with
+external PO editor program to extract messages from code, handle translations in `.po` files and update language
+classes.
+
 ## `Text` reference
 
-## `po2php` reference
+### `Text::_()`
+
+Translate message
+
+```php
+public function _(string $message): string;
+```
+
+#### Parameters
+- `$message` Message in source language to translate.
+
+#### Return value
+Message translated to target language (or original message if translation not found).
+
+#### Example 1: base class, no translation
+```php
+$t = \Vertilia\Text\Text();
+echo $t->_("Several words"); // output: Several words
+```
+
+#### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
+```php
+$t = \App\Locale\MessagesRu();
+echo $t->_("Several words"); // output: Несколько слов
+```
+
+### `Text::nget()`
+
+Translation for plural form of the message, based on argument.
+
+```php
+public function nget(string $singular, string $plural, int $count): string;
+```
+
+#### Parameters
+- `$singular` Singular form of message in source language.
+- `$plural` Plural form of message in source language.
+- `$count` Counter to select the plural form.
+
+#### Return value
+One of plural forms of translated message in target language for provided `$count`.
+
+#### Example 1: base class, no translation
+```php
+$t = \Vertilia\Text\Text();
+printf($t->nget("%u word", "%u words", 1), 1); // output: 1 word
+printf($t->nget("%u word", "%u words", 2), 2); // output: 2 words
+printf($t->nget("%u word", "%u words", 5), 5); // output: 5 words
+```
+
+#### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
+```php
+$t = \App\Locale\MessagesRu();
+printf($t->nget("%u word", "%u words", 1), 1); // output: 1 слово
+printf($t->nget("%u word", "%u words", 2), 2); // output: 2 слова
+printf($t->nget("%u word", "%u words", 5), 5); // output: 5 слов
+```
+
+### `Text::npget()`
+
+Translate plural form of the message in given context, based on argument.
+
+```php
+public function npget(string $context, string $singular, string $plural, int $count): string;
+```
+
+#### Parameters
+- `$context` Context of message in source language.
+- `$singular` Singular form of message in source language.
+- `$plural` Plural form of message in source language.
+- `$count` Counter to select the plural form.
+
+#### Return value
+One of plural forms of translated message in target language and context for provided `$count`.
+
+#### Example 1: base class, no translation
+```php
+$t = \Vertilia\Text\Text();
+printf($t->npget("star", "%u bright", "%u bright", 1), 1); // output: 1 bright
+printf($t->npget("star", "%u bright", "%u bright", 2), 2); // output: 2 bright
+printf($t->npget("star", "%u bright", "%u bright", 5), 5); // output: 5 bright
+```
+
+#### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
+```php
+$t = \App\Locale\MessagesRu();
+printf($t->npget("star", "%u bright", "%u bright", 1), 1); // output: 1 яркая
+printf($t->npget("star", "%u bright", "%u bright", 2), 2); // output: 2 яркие
+printf($t->npget("star", "%u bright", "%u bright", 5), 5); // output: 5 ярких
+```
+
+### `Text::pget()`
+
+Translate the message in given context.
+
+```php
+public function pget(string $context, string $message): string;
+```
+
+#### Parameters
+- `$context` Context of the message in source language.
+- `$message` Message in source language to translate.
+
+#### Return value
+Translated message in target language and context.
+
+#### Example 1: base class, no translation
+```php
+$t = \Vertilia\Text\Text();
+printf($t->npget("star", "It's bright")); // output: It's bright
+```
+
+#### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
+```php
+$t = \App\Locale\MessagesRu();
+printf($t->npget("star", "It's bright")); // output: Она яркая
+```
+
+## Keywords for `xgettext`
+
+To allow `xgettext` to extract messages from `Text` methods that replace classic gettext functions, the
+following configuration should be provided for `xgettext` command line utility:
+```
+xgettext ... --keyword=_ --keyword=pget:1c,2 --keyword=nget:1,2 --keyword=npget:1c,2,3
+```
+
+GUI utilities like Poedit will provide a configuration screen where the keywords may be specified as the following list:
+
+- `_`
+- `pget:1c,2`
+- `nget:1,2`
+- `npget:1c,2,3`
 
 ## Proposed configuration for `composer` and `git`
 
@@ -126,24 +322,11 @@ production hosts, so you will most likely include the following line into your `
 /locale-dev export-ignore
 ```
 
-## Plural forms usage with `sprintf()` calls
+## `po2php` reference
+
+## Plural forms usage with `sprintf()`
 
 ## Plural forms rules rewrite for specific languages
-
-## Keywords for `xgettext`
-
-To allow `xgettext` to extract messages from `Text` methods that replace classic gettext functions, the
-following configuration should be provided for `xgettext` command line utility:
-```
-xgettext ... --keyword=_ --keyword=pget:1c,2 --keyword=nget:1,2 --keyword=npget:1c,2,3
-```
-
-GUI utilities like Poedit will provide a configuration screen where the keywords may be specified as the following list:
-
-- `_`
-- `pget:1c,2`
-- `nget:1,2`
-- `npget:1c,2,3`
 
 ## Class methods replacement for gettext functions
 

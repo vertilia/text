@@ -17,7 +17,7 @@ class Text implements TextInterface
      */
     protected function plural(int $n): int
     {
-        return 0;
+        return (int)($n != 1);
     }
 
     /**
@@ -59,22 +59,22 @@ class Text implements TextInterface
     /**
      * @inheritDoc
      */
-    public function nget(string $message1, string $message2, int $count): string
+    public function nget(string $singular, string $plural, int $count): string
     {
         return $this->fetch(
-            "$message1\f$message2\f{$this->plural($count)}",
-            $count == 1 ? $message1 : $message2
+            "$singular\f$plural\f{$this->plural($count)}",
+            $count == 1 ? $singular : $plural
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function npget(string $context, string $message1, string $message2, int $count): string
+    public function npget(string $context, string $singular, string $plural, int $count): string
     {
         return $this->fetch(
-            "$message1\f$context\f$message2\f{$this->plural($count)}",
-            $count == 1 ? $message1 : $message2
+            "$singular\f$context\f$plural\f{$this->plural($count)}",
+            $count == 1 ? $singular : $plural
         );
     }
 }
