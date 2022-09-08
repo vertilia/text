@@ -42,12 +42,14 @@ if (isset($opts['5']) or isset($opts['php5'])) {
 
 if (isset($opts['h']) or isset($opts['help'])) {
     exit(sprintf(<<<'EOT'
-Usage: %s OPTIONS locale.po
+Usage: %s OPTIONS messages.po
 where OPTIONS:
 -n, --namespace=NAMESPACE   Namespace to use (default: none)
 -c, --class=CLASS_NAME      Class name (default: Messages)
 -e, --extends=PARENT_CLASS  Parent class name implementing \Vertilia\Text\TextInterface
                             (default: \Vertilia\Text\Text)
+-5, --php5                  Produce php5-compatible code (use php5 branch of Text)
+-h, --help                  Print this screen
 
 EOT
         ,

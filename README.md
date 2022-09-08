@@ -125,11 +125,10 @@ echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Plus
 
 Now it's up to you to create translations for other languages. From now on, your localization process with `Text` will
 follow the following path:
-```mermaid
-graph
-    A[Update messages with Text methods] -->|gettext| B(Update .po files)
-    B -->|po2php| C(Update .php files)
-    C -->|Autoloader| A
+```mermaidgraph
+    A[Update messages with Text methods] -->|gettext| B
+    B[Update .po files] -->|po2php| C
+    C[Update .php files] -->|Autoloader| A
 ```
 
 ## Process overview
@@ -283,23 +282,24 @@ GUI utilities like Poedit will provide a configuration screen where the keywords
 When producing `Text` classes we recommend you to store them in `locale/` folder of your application. Consider the
 following layout (simplified, 3 languages):
 ```
-- locale/
-  MessagesEn.php
-  MessagesFr.php
-  MessagesRu.php
-- locale-dev/
-  - en/
-    messages.po
-  - fr/
-    messages.po
-  - ru/
-    messages.po
-- src/
-  index.php
-- vendor/
-  - composer/
-.gitattributes
-composer.json
+/app/
+|-- locale/
+|   |-- MessagesEn.php
+|   |-- MessagesFr.php
+|   `-- MessagesRu.php
+|-- locale-dev/
+|   |-- en/
+|   |   `-- messages.po
+|   |-- fr/
+|   |   `-- messages.po
+|   `-- ru/
+|       `-- messages.po
+|-- src/
+|   `-- index.php
+|-- vendor/
+|   `-- composer/
+|-- .gitattributes
+`-- composer.json
 ```
 
 Here, your application code is located in `src/` folder and, presuming the application namespace is `App`, messages
@@ -324,9 +324,77 @@ production hosts, so you will most likely include the following line into your `
 
 ## `po2php` reference
 
+```shell
+$ po2php --help
+Usage: po2php OPTIONS messages.po
+where OPTIONS:
+-n, --namespace=NAMESPACE   Namespace to use (default: none)
+-c, --class=CLASS_NAME      Class name (default: Messages)
+-e, --extends=PARENT_CLASS  Parent class name implementing \Vertilia\Text\TextInterface
+                            (default: \Vertilia\Text\Text)
+-5, --php5                  Produce php5-compatible code (use php5 branch of Text)
+-h, --help                  Print this screen
+```
+
 ## Plural forms usage with `sprintf()`
 
+For detailed discussion see [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
+
 ## Plural forms rules rewrite for specific languages
+
+The plural form selector, incorporated into PO files, is in fact a C language code snippet that returns a 0-based index
+of a plural form. In most cases this code translates to php in quite a straightforward way, like in example below:
+```
+# English, nplurals = 2
+(n != 1)
+```
+Germanic-family languages like English or German only have 2 plural forms and every number which is not 1 is actually a
+plural:
+
+| example | plural form |
+|---------|-------------|
+| 0 lines |             |
+| 1 line  |             |
+| 2 lines |             |
+| 3 lines |             |
+
+Slavic-family languages like Russian,  may contain a complex ternary condition, like in the following example:
+```
+# Russian, nplurals = 3
+(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2)
+```
+Here, in Russian we have 3 forms, which are close to impossible to describe in one phrase. Single form is for every
+number that terminates by 1 (but not by 11). First plural form is for numbers terminated by 2, 3 or 4 (but not by 12, 13
+or 14). All the rest (including 0, 11, 12, 13 and 14) are second plural form. Examples:
+
+| example    | plural form |
+|------------|-------------|
+| 0 строк    | 2           |
+| 1 строка   | 0           |
+| 2 строки   | 1           |
+| 5 строк    | 2           |
+| 10 строк   | 2           |
+| 11 строк   | 2           |
+| 12 строк   | 2           |
+| 15 строк   | 2           |
+| 20 строк   | 2           |
+| 21 строка  | 0           |
+| 22 строки  | 1           |
+| 25 строк   | 2           |
+| 100 строк  | 2           |
+| 101 строка | 0           |
+| 102 строки | 1           |
+| 105 строк  | 2           |
+
+You can find more examples at [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
+
+**ATTENTION** Ternary condition statement in php before version 8.0 has other associativity than in C, so the default
+rule in PO file for languages using chained ternary operators for plural form selector needs to be corrected with
+additional parenthesis:
+```
+# Russian (php7-compat), nplurals = 3
+(n%10==1 && n%100!=11 ? 0 : (n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2))
+```
 
 ## Class methods replacement for gettext functions
 
