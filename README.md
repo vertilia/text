@@ -125,7 +125,8 @@ echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Plus
 
 Now it's up to you to create translations for other languages. From now on, your localization process with `Text` will
 follow the following path:
-```mermaidgraph
+```mermaid
+graph
     A[Update messages with Text methods] -->|gettext| B
     B[Update .po files] -->|po2php| C
     C[Update .php files] -->|Autoloader| A
