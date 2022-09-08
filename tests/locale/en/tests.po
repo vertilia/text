@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 23:20+0200\n"
+"POT-Creation-Date: 2022-09-09 01:54+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Stas Trefilov <stas.trefilov@gmail.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:33 TextTest.php:34
+#: TextTest.php:37 TextTest.php:38
 msgid "An apple"
 msgstr "An apple"
 
-#: TextTest.php:46 TextTest.php:51
+#: TextTest.php:50 TextTest.php:55
 msgctxt "grass"
 msgid "Green"
 msgstr "Green"
 
-#: TextTest.php:68 TextTest.php:69
+#: TextTest.php:72 TextTest.php:73
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
 msgstr[0] "%u line"
 msgstr[1] "%u lines"
 
-#: TextTest.php:88 TextTest.php:89
+#: TextTest.php:92 TextTest.php:93
 #, php-format
 msgctxt "line"
 msgid "%u sent"
