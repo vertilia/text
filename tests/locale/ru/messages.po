@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-09 01:42+0200\n"
+"POT-Creation-Date: 2022-09-10 01:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Stas Trefilov <stas.trefilov@gmail.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
@@ -18,16 +18,26 @@ msgstr ""
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:37 TextTest.php:38
+#: TextTest.php:44 TextTest.php:45 TextTest.php:46
 msgid "An apple"
 msgstr "Яблоко"
 
-#: TextTest.php:50 TextTest.php:55
+#: TextTest.php:48 TextTest.php:49 TextTest.php:50
+msgid ""
+"This is a\n"
+"multiline\n"
+"string"
+msgstr ""
+"Вот это\n"
+"многострочный\n"
+"текст"
+
+#: TextTest.php:54 TextTest.php:55 TextTest.php:56
 msgctxt "grass"
 msgid "Green"
 msgstr "Зелёная"
 
-#: TextTest.php:72 TextTest.php:73
+#: TextTest.php:74 TextTest.php:75 TextTest.php:76
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
@@ -35,7 +45,7 @@ msgstr[0] "%u строка"
 msgstr[1] "%u строки"
 msgstr[2] "%u строк"
 
-#: TextTest.php:92 TextTest.php:93
+#: TextTest.php:103 TextTest.php:104 TextTest.php:105
 #, php-format
 msgctxt "line"
 msgid "%u sent"

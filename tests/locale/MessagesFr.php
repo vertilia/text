@@ -6,6 +6,9 @@ class MessagesFr extends \Vertilia\Text\Text
 {
     protected array $translations = array (
   859572441 => 'Une pomme',
+  2255647288 => 'Ceci est
+une chaîne
+multiligne',
   718478652 => 'Verte',
   1304870824 => '%u ligne',
   985763646 => '%u lignes',

@@ -2,44 +2,54 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-09 01:54+0200\n"
+"POT-Creation-Date: 2022-09-10 01:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Stas Trefilov <stas.trefilov@gmail.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
-"Language: en\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Generator: Poedit 3.1.1\n"
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:37 TextTest.php:38
+#: TextTest.php:44 TextTest.php:45 TextTest.php:46
 msgid "An apple"
-msgstr "An apple"
+msgstr "Une pomme"
 
-#: TextTest.php:50 TextTest.php:55
+#: TextTest.php:48 TextTest.php:49 TextTest.php:50
+msgid ""
+"This is a\n"
+"multiline\n"
+"string"
+msgstr ""
+"Ceci est\n"
+"une chaîne\n"
+"multiligne"
+
+#: TextTest.php:54 TextTest.php:55 TextTest.php:56
 msgctxt "grass"
 msgid "Green"
-msgstr "Green"
+msgstr "Verte"
 
-#: TextTest.php:72 TextTest.php:73
+#: TextTest.php:74 TextTest.php:75 TextTest.php:76
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
-msgstr[0] "%u line"
-msgstr[1] "%u lines"
+msgstr[0] "%u ligne"
+msgstr[1] "%u lignes"
 
-#: TextTest.php:92 TextTest.php:93
+#: TextTest.php:103 TextTest.php:104 TextTest.php:105
 #, php-format
 msgctxt "line"
 msgid "%u sent"
 msgid_plural "%u sent"
-msgstr[0] "%u sent"
-msgstr[1] "%u sent"
+msgstr[0] "%u envoyée"
+msgstr[1] "%u envoyées"
 
 #~ msgid "Next"
 #~ msgstr "Suivant"

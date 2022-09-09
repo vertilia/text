@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass \Vertilia\Text\Text
+ * to generate MessagesEn catalog:
+ * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesEn tests/locale/en/messages.po >tests/locale/MessagesEn.php
  * to generate MessagesFr catalog:
- * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesFr tests/locale/fr/tests.po >tests/locale/MessagesFr.php
+ * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesFr tests/locale/fr/messages.po >tests/locale/MessagesFr.php
  * to generate MessagesRu catalog:
- * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/tests.po >tests/locale/MessagesRu.php
+ * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
  *
  * using docker:
  * $docker run --rm --volume $PWD:/app php /app/bin/po2php ... /app/tests/locale/fr/tests.po ...
@@ -21,85 +23,97 @@ class TextTest extends TestCase
     const DOMAIN = 'tests';
 
     /**
-     * Reset Text class
-     */
-    public function setUp(): void
-    {
-        $this->text_fr = new Locale\MessagesFr();
-        $this->text_ru = new Locale\MessagesRu();
-    }
-
-    /**
      * @covers ::_
+     * @covers ::pget
+     * @dataProvider _PgetProvider
      */
-    public function test_()
+    public function test_Pget($expected, $actual, $comment)
     {
-        $this->assertEquals('Une pomme', $this->text_fr->_('An apple'), 'existing translation in Fr');
-        $this->assertEquals('Яблоко', $this->text_ru->_('An apple'), 'existing translation in Ru');
-        $unknown = 'non-existent ' . rand(100, 999);
-        $this->assertEquals($unknown, $this->text_fr->_($unknown), 'non-existent translation');
+        $this->assertEquals($expected, $actual, $comment);
     }
 
-    /**
-     * @covers ::pget
-     */
-    public function testPget()
+    public function _PgetProvider()
     {
-        $this->assertEquals(
-            'Verte',
-            $this->text_fr->pget('grass', 'Green'),
-            'existing translation using context in Fr'
-        );
-        $this->assertEquals(
-            'Зелёная',
-            $this->text_ru->pget('grass', 'Green'),
-            'existing translation using context in Ru'
-        );
+        $text_en = new Locale\MessagesEn();
+        $text_fr = new Locale\MessagesFr();
+        $text_ru = new Locale\MessagesRu();
+
         $unknown = 'non-existent ' . rand(100, 999);
-        $this->assertEquals(
-            $unknown,
-            $this->text_fr->pget('grass', $unknown),
-            'non-existent translation using context'
-        );
+
+        return [
+            ['An apple', $text_en->_('An apple'), 'existing translation in En'],
+            ['Une pomme', $text_fr->_('An apple'), 'existing translation in Fr'],
+            ['Яблоко', $text_ru->_('An apple'), 'existing translation in Ru'],
+
+            ["This is a\nmultiline\nstring", $text_en->_("This is a\nmultiline\nstring"), 'existing multiline translation in En'],
+            ["Ceci est\nune chaîne\nmultiligne", $text_fr->_("This is a\nmultiline\nstring"), 'existing multiline translation in Fr'],
+            ["Вот это\nмногострочный\nтекст", $text_ru->_("This is a\nmultiline\nstring"), 'existing multiline translation in Ru'],
+
+            [$unknown, $text_en->_($unknown), 'non-existent translation'],
+
+            ['Green', $text_en->pget('grass', 'Green'), 'existing translation using context in En'],
+            ['Verte', $text_fr->pget('grass', 'Green'), 'existing translation using context in Fr'],
+            ['Зелёная', $text_ru->pget('grass', 'Green'), 'existing translation using context in Ru'],
+
+            [$unknown, $text_fr->pget('grass', $unknown), 'non-existent translation using context'],
+        ];
     }
 
     /**
      * @covers ::nget
      * @dataProvider ngetProvider
      */
-    public function testNget($n, $expected)
+    public function testNget($expected, $n)
     {
-        $this->assertEquals($expected['fr'], sprintf($this->text_fr->nget('%u line', '%u lines', $n), $n));
-        $this->assertEquals($expected['ru'], sprintf($this->text_ru->nget('%u line', '%u lines', $n), $n));
+        $text_en = new Locale\MessagesEn();
+        $text_fr = new Locale\MessagesFr();
+        $text_ru = new Locale\MessagesRu();
+
+        $unknown = 'non-existent ' . rand(100, 999);
+
+        $this->assertEquals($expected['en'], sprintf($text_en->nget('%u line', '%u lines', $n), $n), 'existing plural form in En');
+        $this->assertEquals($expected['fr'], sprintf($text_fr->nget('%u line', '%u lines', $n), $n), 'existing plural form in Fr');
+        $this->assertEquals($expected['ru'], sprintf($text_ru->nget('%u line', '%u lines', $n), $n), 'existing plural form in Ru');
+
+        $this->assertEquals($unknown, $text_ru->nget($unknown, $unknown, $n), 'non-existent plural form');
     }
 
     public function ngetProvider()
     {
         return [
-            'zero lines' => [0, ['fr' => '0 ligne', 'ru' => '0 строк']],
-            'one line' => [1, ['fr' => '1 ligne', 'ru' => '1 строка']],
-            'two lines' => [2, ['fr' => '2 lignes', 'ru' => '2 строки']],
-            'five lines' => [5, ['fr' => '5 lignes', 'ru' => '5 строк']],
+            'zero lines' => [['en' => '0 lines', 'fr' => '0 ligne', 'ru' => '0 строк'], 0],
+            'one line' => [['en' => '1 line', 'fr' => '1 ligne', 'ru' => '1 строка'], 1],
+            'two lines' => [['en' => '2 lines', 'fr' => '2 lignes', 'ru' => '2 строки'], 2],
+            'five lines' => [['en' => '5 lines', 'fr' => '5 lignes', 'ru' => '5 строк'], 5],
         ];
     }
 
     /**
      * @covers ::npget
-     * @dataProvider pgetProvider
+     * @dataProvider npgetProvider
      */
-    public function testNpget($n, $expected)
+    public function testNpget($expected, $n)
     {
-        $this->assertEquals($expected['fr'], sprintf($this->text_fr->npget('line', '%u sent', '%u sent', $n), $n));
-        $this->assertEquals($expected['ru'], sprintf($this->text_ru->npget('line', '%u sent', '%u sent', $n), $n));
+        $text_en = new Locale\MessagesEn();
+        $text_fr = new Locale\MessagesFr();
+        $text_ru = new Locale\MessagesRu();
+
+        $unknown = 'non-existent ' . rand(100, 999);
+
+        $this->assertEquals($expected['en'], sprintf($text_en->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in En');
+        $this->assertEquals($expected['fr'], sprintf($text_fr->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in Fr');
+        $this->assertEquals($expected['ru'], sprintf($text_ru->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in Ru');
+
+        $this->assertEquals($unknown, $text_en->npget('line', $unknown, $unknown, $n), 'non-existent plural form');
     }
 
-    public function pgetProvider()
+    public function npgetProvider()
     {
         return [
-            'zero lines' => [0, ['fr' => '0 envoyée', 'ru' => '0 отправлено']],
-            'one line' => [1, ['fr' => '1 envoyée', 'ru' => '1 отправлена']],
-            'two lines' => [2, ['fr' => '2 envoyées', 'ru' => '2 отправлены']],
-            'five lines' => [5, ['fr' => '5 envoyées', 'ru' => '5 отправлено']],
+            'zero sent (line)' => [['en' => '0 sent', 'fr' => '0 envoyée', 'ru' => '0 отправлено'], 0],
+            'one sent (line)' => [['en' => '1 sent', 'fr' => '1 envoyée', 'ru' => '1 отправлена'], 1],
+            'two sent (line)' => [['en' => '2 sent', 'fr' => '2 envoyées', 'ru' => '2 отправлены'], 2],
+            'five sent (line)' => [['en' => '5 sent', 'fr' => '5 envoyées', 'ru' => '5 отправлено'], 5],
         ];
     }
 }
