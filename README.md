@@ -337,11 +337,7 @@ where OPTIONS:
 -h, --help                  Print this screen
 ```
 
-## Plural forms usage with `sprintf()`
-
-For detailed discussion see [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
-
-## Plural forms rules rewrite for specific languages
+## Plural forms in different languages
 
 The plural form selector, incorporated into PO files, is in fact a C language code snippet that returns a 0-based index
 of a plural form. In most cases this code translates to php in quite a straightforward way, like in example below:
@@ -366,7 +362,7 @@ Other language families may contain a more complex condition:
 ```
 ```
 # Russian (alternative form), nplurals = 3
-(n%10==0 || n%10 > 4 || (n%100>=11 && n%100<=14) ? 2 : n%10 != 1)
+(n%10==0 || n%10>4 || (n%100>=11 && n%100<=14) ? 2 : n%10 != 1)
 ```
 Slavic-family languages like Russian or Serbian have 3 plural forms, which are close to impossible to describe in one
 phrase. Single form is for every number that terminates by 1 (but not by 11). First plural form is for numbers
@@ -394,17 +390,23 @@ Examples:
 
 You can find more examples at [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
 
-**ATTENTION** Ternary condition statement in php before version 8.0 has other associativity than in C, so the default
-rule in PO file for languages using chained ternary operators for plural form selector needs to be corrected with
-additional parenthesis in PO file:
+## Plural forms rules rewrite for specific languages
+
+Ternary condition statement in php before version 8.0 has other associativity than in C, so the default rule in PO file
+for languages using chained ternary operators for plural form selector needs to be corrected with additional parenthesis
+in PO file:
 ```
 # Russian (php7-compat), nplurals = 3
 (n%10==1 && n%100!=11 ? 0 : (n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2))
 ```
 ```
 # Russian (php7-compat alternative form), nplurals = 3
-(n%10==0 || n%10 > 4 || (n%100>=11 && n%100<=14) ? 2 : (n%10 != 1))
+(n%10==0 || n%10>4 || (n%100>=11 && n%100<=14) ? 2 : (n%10 != 1))
 ```
+
+## Plural forms usage with `sprintf()`
+
+For detailed discussion see [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
 
 ## Class methods replacement for gettext functions
 

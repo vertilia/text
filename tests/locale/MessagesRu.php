@@ -20,6 +20,6 @@ class MessagesRu extends \Vertilia\Text\Text
 
     protected function plural(int $n): int
     {
-        return (int)(($n%10==0 || $n%10 > 4 || ($n%100>=11 && $n%100<=14) ? 2 : ($n%10 != 1)));
+        return (int)(($n%10==0 || $n%10>4 || ($n%100>=11 && $n%100<=14) ? 2 : ($n%10 != 1)));
     }
 }
