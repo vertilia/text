@@ -327,8 +327,8 @@ production hosts, so you will most likely include the following line into your `
 
 ```shell
 $ po2php --help
-Usage: po2php OPTIONS messages.po
-where OPTIONS:
+Usage: po2php [OPTIONS] messages.po
+OPTIONS:
 -n, --namespace=NAMESPACE   Namespace to use (default: none)
 -c, --class=CLASS_NAME      Class name (default: Messages)
 -e, --extends=PARENT_CLASS  Parent class name implementing \Vertilia\Text\TextInterface
