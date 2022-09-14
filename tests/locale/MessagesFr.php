@@ -5,15 +5,15 @@ namespace Vertilia\Text\Tests\Locale;
 class MessagesFr extends \Vertilia\Text\Text
 {
     protected array $translations = array (
-  859572441 => 'Une pomme',
-  2255647288 => 'Ceci est
+  '333c08d9' => 'Une pomme',
+  86727238 => 'Ceci est
 une chaîne
 multiligne',
-  718478652 => 'Verte',
-  1304870824 => '%u ligne',
-  985763646 => '%u lignes',
-  2551675992 => '%u envoyée',
-  4010822862 => '%u envoyées',
+  '2ad31d3c' => 'Verte',
+  '4dc6bfa8' => '%u ligne',
+  '3ac18f3e' => '%u lignes',
+  '98177c58' => '%u envoyée',
+  'ef104cce' => '%u envoyées',
 );
 
     protected function plural(int $n): int

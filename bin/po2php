@@ -157,13 +157,14 @@ class PoLineProcessor
         }
 
         // read plurals rule from header and drop header
-        if (isset($this->translations[0])) {
-            if (is_array($this->translations[0])) {
-                $header = $this->translations[0][0];
-                unset($this->translations[0][0]);
+        $hash0 = hash('crc32b', '');
+        if (isset($this->translations[$hash0])) {
+            if (is_array($this->translations[$hash0])) {
+                $header = $this->translations[$hash0][0];
+                unset($this->translations[$hash0][0]);
             } else {
-                $header = $this->translations[0];
-                unset($this->translations[0]);
+                $header = $this->translations[$hash0];
+                unset($this->translations[$hash0]);
             }
 
             if (preg_match('/Plural-Forms: .*plural=([^;]+)/', $header, $m)) {
@@ -245,7 +246,7 @@ class PoLineProcessor
 
             foreach ($this->msgstr_plural as $n => $str) {
                 $idn = "$id\f$n";
-                $hash = crc32($idn);
+                $hash = hash('crc32b', $idn);
                 eval(sprintf('$str = "%s";', $str));
 
                 if (empty($this->translations[$hash])) {
@@ -257,7 +258,7 @@ class PoLineProcessor
                 }
             }
         } else {
-            $hash = crc32($id);
+            $hash = hash('crc32b', $id);
             eval(sprintf('$this->msgstr = "%s";', $this->msgstr));
 
             if (empty($this->translations[$hash])) {

@@ -21,16 +21,27 @@ class Text implements TextInterface
     }
 
     /**
+     * Defines message hash, uses crc32b algo for better portability.
+     *
+     * @param string $message
+     * @return string
+     */
+    public function hash(string $message): string
+    {
+        return hash('crc32b', $message);
+    }
+
+    /**
      * Fetches an existing string from $translations by its hash and
      * message text (in case of collision)
-     * 
+     *
      * @param string $message the original message text used to produce the hash
      * @param string $default message text to use if translation not found
      * @return string
      */
     protected function fetch(string $message, string $default): string
     {
-        $hash = crc32($message);
+        $hash = $this->hash($message);
 
         return isset($this->translations[$hash])
             ? (is_array($this->translations[$hash])

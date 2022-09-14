@@ -345,6 +345,12 @@ OPTIONS:
 -h, --help                  Print this screen
 ```
 
+#### Example: generate `MessagesRu` catalog in `tests/locale`
+
+```shell
+$ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
+```
+
 ## Plural forms in different languages
 
 The plural form selector, incorporated into PO files, is in fact a C language code snippet that returns a 0-based index
