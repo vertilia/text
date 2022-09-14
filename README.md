@@ -15,6 +15,14 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 
 ## Advantages
 
+> **From manual:**
+> 
+> GNU `gettext` is designed to minimize the impact of internationalization on program sources, keeping this impact as
+> small and hardly noticeable as possible. Internationalization has better chances of succeeding if it is very light
+> weighted, or at least, appear to be so, when looking at program sources.
+
+- no need to use constants or other intermediate constructs replacing messages in source code;
+- handling of plural forms and context-based translations;
 - use of standard translation process based on PO files, multitude of editors or processes may be used;
 - translations are stored in `.php` files which allows for a quick autoloading and opcode caching, minimized runtime
   effort to get translation into memory;
