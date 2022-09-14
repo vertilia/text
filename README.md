@@ -15,8 +15,7 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 
 ## Advantages
 
-> **From manual:**
-> 
+> **From manual:**<br>
 > GNU `gettext` is designed to minimize the impact of internationalization on program sources, keeping this impact as
 > small and hardly noticeable as possible. Internationalization has better chances of succeeding if it is very light
 > weighted, or at least, appear to be so, when looking at program sources.
@@ -30,7 +29,7 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 
 ## Usage
 
-Programming in c with gettext historically consists of the following phases (simplified):
+Programming in C with gettext historically consists of the following phases (simplified):
 
 1. define the source messages language used in your code (normally english)
 2. use gettext functions in your source code when using localized messages
