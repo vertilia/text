@@ -22,7 +22,7 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 
 - no need to use constants or other intermediate constructs replacing messages in source code;
 - handling of plural forms and context-based translations;
-- use of standard translation process based on PO files, multitude of editors or processes may be used;
+- standard translation process based on PO files; multitude of editors or processes may be used;
 - translations are stored in `.php` files which allows for a quick autoloading and opcode caching, minimized runtime
   effort to get translation into memory;
 - stable and predictable work in multiprocess web environments, not tied to currently installed system locales.
@@ -32,7 +32,7 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 Programming in C with gettext historically consists of the following phases (simplified):
 
 1. define the source messages language used in your code (normally english)
-2. use gettext functions in your source code when using localized messages
+2. use gettext functions in your source code when working with localized messages
    - (without existing translations, gettext functions simply return the passed strings, so the code is already
      working at this stage, returning english messages in all environments)
 3. use gettext command line utilities to scan your code and extract localized messages, producing (or updating) `.po`
@@ -41,9 +41,9 @@ Programming in C with gettext historically consists of the following phases (sim
      forms of the target language)
 4. translate new/updated messages in `.po` file
 5. compile text `.po` file into binary `.mo` file
-6. copy `.mo` file into your code, so that now gettext functions could use them to extract translations for their
-   arguments
-7. return to 2.
+6. copy `.mo` file into your code, so that now gettext functions (mentioned in 2.) could use them to extract
+   translations for their arguments
+7. go to 2.
 
 In `Text` we bypass phases 5. and 6. that process and handle compressed binary format to avoid complex operations at
 runtime, and compile `.po` files directly into `.php` classes, containing translated strings and plural forms rules for
@@ -64,7 +64,7 @@ messages.
 ```php
 <?php
 
-require_once __DIR__ . 'vendor/composer/autoload.php';
+require_once __DIR__ . '/vendor/composer/autoload.php';
 
 $t = new \Vertilia\Text\Text();
 
@@ -75,12 +75,13 @@ echo $t->nget('One page', 'Multiple pages', 5), PHP_EOL; // output: Multiple pag
 echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Multiple sent
 ```
 
-When you process the above code with gettext tools (we highly recommend using widely-available translation tools, like
-[Poedit](https://poedit.net/) or others) you'll produce a text file with `.po` extension with source language messages
-and placeholders for target language translations, say French. After translating the placeholders in `.po` file, you
-normally include the result file in your project as `locale/fr/LC_MESSAGES/messages.po`. This is a GNU norm, but of
-course you may use any folder and filename. The most important part here is that you (and other users of your codebase)
-could easily locate translation files and clearly distinguish languages and domains.
+When you extract messages from the above code with gettext tools (we highly recommend using widely-available translation
+tools, like [Poedit](https://poedit.net/) or others) you'll produce a text file with `.po` extension containing source
+language messages, placeholders for target language translations, say French, and a rule for French plural form
+conversion. After translating the placeholders in `.po` file into French, you normally include the result file in your
+project as `locale/fr/LC_MESSAGES/messages.po`. This is a GNU norm, but of course you may use any folder and filename.
+The most important part here is that you (and other users of your codebase) could easily locate translation files and
+clearly distinguish languages and domains.
 
 > See [Keywords for `xgettext`](#keywords-for-xgettext) below for things to configure when running gettext tools on your
 > codebase.
@@ -89,34 +90,35 @@ Simplified view of the contents of `messages.po` file for our project:
 
 | source (en)                       | target (fr)          |
 |-----------------------------------|----------------------|
+| `plural form rule:`               | `(n > 1)`            |
 | "Just a test"                     | "Juste un test"      |
 | "Next" (context: "page")          | "Suivante"           |
 | "One page"                        | "Une page"           |
 | "Multiple pages"                  | "Plusieurs pages"    |
 | "One sent" (context: "page")      | "Une envoyée"        |
 | "Multiple sent" (context: "page") | "Plusieurs envoyées" |
-| `plural form rule`                | `(n > 1)`            |
 
-Don't forget where you stored the resulting `messages.po` file, since you'll need it right away to produce translations
-class. To do this you'll run the bundled `bin/po2php` command and give it the path to the `messages.po` file. It will
-output the php code that you will include in your project as an easily located `locale/MessagesFr.php` file.
+Note where you stored the resulting `messages.po` file, since you'll need it right away to produce translations class.
+To do this you'll run the bundled `bin/po2php` command (see examples [below](#po2php-reference)) and give it the path to
+the `messages.po` file. It will output the php code that you will include in your project as an easily
+located `locale-src/MessagesFr.php` file.
 
 So for now, you added 2 additional files to your project:
 
 - `locale/fr/LC_MESSAGES/messages.po`: text file with English source messages from your application code, French
-  translations for every message and a (not so) simple rule that describes the use of plural form(s) in target language,
-  French. You will need this file to update existing translations, add new ones and remove unused ones. This is a
-  standard PO file that you may edit with many available tools. Every translation bureau will handle this format (if it
-  does not, you better choose another one).
-- `locale/MessagesFr.php`: php class that encapsulates translations for target language and a method for handling French
-  plural forms.
+  translations for every message and a simple rule that describes the use of plural form in target language, French. You
+  will need this file to update existing translations, add new ones and remove unused ones. This is a standard PO file
+  that you may edit with many available tools. Every translation bureau will handle this format (if it does not, you
+  better choose another one).
+- `locale-src/MessagesFr.php`: php class generated from `messages.po` file that encapsulates translations for target
+  language and a method for handling French plural form.
 
 Now it's time to use the generated `MessagesFr` class instead of the base `Text` to display your translated messages:
 
 ```php
 <?php
 
-require_once __DIR__ . 'vendor/composer/autoload.php';
+require_once __DIR__ . '/vendor/composer/autoload.php';
 
 $t = new \App\Locale\MessagesFr();
 
@@ -128,15 +130,15 @@ echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Plus
 ```
 
 > See [Proposed configuration for `composer` and `git`](#proposed-configuration-for-composer-and-git) below for sample
-> composer configuration.
+> `composer` configuration.
 
 Now it's up to you to create translations for other languages. From now on, your localization process with `Text` will
 follow the following path:
 ```mermaid
 graph
-    A[Update messages with Text methods] -->|gettext| B
-    B[Update .po files] -->|po2php| C
-    C[Update .php files] -->|Autoloader| A
+    A[Add/Update messages wrapped by `Text` methods] -->| gettext | B
+    B[Update `.po` files] -->| po2php | C
+    C[Update `.php` files] -->| Autoloader | A
 ```
 
 ## Process overview
@@ -147,8 +149,8 @@ classes extending `Vertilia\Text\Text` base class with translations and overridd
 correct plural forms in target languages.
 
 Normally your code will consist of injecting `Vertilia\Text\TextInterface` objects, creating messages and work with
-external PO editor program to extract messages from code, handle translations in `.po` files and update language
-classes.
+external PO editor program to extract messages from code, handle translations in `.po` files, and update language
+classes with `po2php` tool.
 
 ## `Text` reference
 
@@ -164,7 +166,7 @@ public function _(string $message): string;
 - `$message` Message in source language to translate.
 
 #### Return value
-Message translated to target language (or original message if translation not found).
+Message translated into target language (or original message if translation not found).
 
 #### Example 1: base class, no translation
 ```php
@@ -180,7 +182,7 @@ echo $t->_("Several words"); // output: Несколько слов
 
 ### `Text::nget()`
 
-Translation for plural form of the message, based on argument.
+Translation for plural forms of the message, based on argument.
 
 ```php
 public function nget(string $singular, string $plural, int $count): string;
@@ -287,15 +289,15 @@ GUI utilities like Poedit will provide a configuration screen where the keywords
 
 ## Proposed configuration for `composer` and `git`
 
-When producing `Text` classes we recommend you to store them in `locale/` folder of your application. Consider the
+When producing `Text` classes we recommend you to store them in `locale-src/` folder of your application. Consider the
 following layout (simplified, 3 languages):
 ```
 /app/
-|-- locale/
+|-- locale-src/
 |   |-- MessagesEn.php
 |   |-- MessagesFr.php
 |   `-- MessagesRu.php
-|-- locale-dev/
+|-- locale/
 |   |-- en/
 |   |   `-- messages.po
 |   |-- fr/
@@ -317,17 +319,17 @@ classes namespace is `App\Locale`, your composer `autoload` directive is configu
   "autoload": {
     "psr-4": {
       "App\\": "src/",
-      "App\\Locale\\": "locale/"
+      "App\\Locale\\": "locale-src/"
     }
   }
 }
 ```
 
-Please note, `locale-dev/` folder storing `.po` files is separated from `locale/` folder with `Text` message classes to
+Please note, `locale/` folder storing `.po` files is separated from `locale-src/` folder with `Text` message classes to
 simplify exclusion of this folder from the binary version of your application. You don't need intermediate files on
 production hosts, so you will most likely include the following line into your `.gitattributes`:
 ```
-/locale-dev export-ignore
+/locale export-ignore
 ```
 
 ## `po2php` reference
@@ -344,10 +346,21 @@ OPTIONS:
 -h, --help                  Print this screen
 ```
 
-#### Example: generate `MessagesRu` catalog in `tests/locale`
+#### Example 1: generate `MessagesRu` catalog in `tests/locale`
 
 ```shell
-$ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
+$ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu \
+  tests/locale/ru/messages.po \
+  >tests/locale/MessagesRu.php
+```
+
+#### Example 2: generate `MessagesRu` catalog in `tests/locale` with `docker`
+
+```shell
+$ docker run --rm --volume $PWD:/app php \
+  php bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu \
+  /app/tests/locale/ru/messages.po \
+  >tests/locale/MessagesRu.php
 ```
 
 ## Plural forms in different languages
@@ -363,8 +376,8 @@ plural:
 
 | example | plural form |
 |---------|-------------|
-| 0 lines | 0           |
-| 1 line  | 1           |
+| 0 lines | 1           |
+| 1 line  | 0           |
 | 2 lines | 1           |
 | 3 lines | 1           |
 
@@ -434,7 +447,9 @@ For detailed discussion see [gettext manual](https://www.gnu.org/software/gettex
 
 - GNU gettext manual:
   https://www.gnu.org/software/gettext/manual/gettext.html
+- Preparing translatable strings:
+  https://www.gnu.org/software/gettext/manual/html_node/Preparing-Strings.html#Preparing-Strings
 - POedit translations editor:
   https://poedit.net/
-- .gitattributes:
+- `.gitattributes`:
   https://git-scm.com/docs/gitattributes#_creating_an_archive

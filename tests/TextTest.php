@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
  * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
  *
  * using docker:
- * $docker run --rm --volume $PWD:/app php /app/bin/po2php ... /app/tests/locale/fr/tests.po ...
+ * $docker run --rm --volume $PWD:/app php php /app/bin/po2php ... /app/tests/locale/fr/tests.po ...
  *
- * N.B. update plural rule in locale/ru/tests.po to match php ternary operator precedence, different from c
+ * N.B. updated plural rule in locale/ru/tests.po to match php (pre-v8) ternary operator precedence, different from C
  */
 class TextTest extends TestCase
 {
@@ -34,9 +34,13 @@ class TextTest extends TestCase
 
     public function _PgetProvider()
     {
+        $xx = new \Vertilia\Text\Text();
         $text_en = new Locale\MessagesEn();
         $text_fr = new Locale\MessagesFr();
         $text_ru = new Locale\MessagesRu();
+
+        $msg1 = $xx->_('Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s');
+        $msg2 = $xx->_("Quotes: 'apostrophes', \"quotes\"; var parsing: \$i, \${i}, {\$i}; printf formats: %s, %2\$s");
 
         $unknown = 'non-existent ' . rand(100, 999);
 
@@ -44,10 +48,37 @@ class TextTest extends TestCase
             ['An apple', $text_en->_('An apple'), 'existing translation in En'],
             ['Une pomme', $text_fr->_('An apple'), 'existing translation in Fr'],
             ['Яблоко', $text_ru->_('An apple'), 'existing translation in Ru'],
+            [
+                'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
+                $text_en->_($msg1),
+                'special chars in En'
+            ],
+            [
+                'Guillemets: \'apostrophes\', "quotes"; interprétation de vars: $i, ${i}, {$i}; formats printf: %s, %2$s',
+                $text_fr->_($msg1),
+                'special chars in En'
+            ],
+            [
+                'Кавычки: \'апострофы\', "кавычки"; обработка переменных: $i, ${i}, {$i}; форматы printf: %s, %2$s',
+                $text_ru->_($msg2),
+                'special chars in Ru'
+            ],
 
-            ["This is a\nmultiline\nstring", $text_en->_("This is a\nmultiline\nstring"), 'existing multiline translation in En'],
-            ["Ceci est\nune chaîne\nmultiligne", $text_fr->_("This is a\nmultiline\nstring"), 'existing multiline translation in Fr'],
-            ["Вот это\nмногострочный\nтекст", $text_ru->_("This is a\nmultiline\nstring"), 'existing multiline translation in Ru'],
+            [
+                "This is a\nmultiline\nstring",
+                $text_en->_("This is a\nmultiline\nstring"),
+                'existing multiline translation in En'
+            ],
+            [
+                "Ceci est\nune chaîne\nmultiligne",
+                $text_fr->_("This is a\nmultiline\nstring"),
+                'existing multiline translation in Fr'
+            ],
+            [
+                "Вот это\nмногострочный\nтекст",
+                $text_ru->_("This is a\nmultiline\nstring"),
+                'existing multiline translation in Ru'
+            ],
 
             [$unknown, $text_en->_($unknown), 'non-existent translation'],
 
@@ -71,9 +102,21 @@ class TextTest extends TestCase
 
         $unknown = 'non-existent ' . rand(100, 999);
 
-        $this->assertEquals($expected['en'], sprintf($text_en->nget('%u line', '%u lines', $n), $n), 'existing plural form in En');
-        $this->assertEquals($expected['fr'], sprintf($text_fr->nget('%u line', '%u lines', $n), $n), 'existing plural form in Fr');
-        $this->assertEquals($expected['ru'], sprintf($text_ru->nget('%u line', '%u lines', $n), $n), 'existing plural form in Ru');
+        $this->assertEquals(
+            $expected['en'],
+            sprintf($text_en->nget('%u line', '%u lines', $n), $n),
+            'existing plural form in En'
+        );
+        $this->assertEquals(
+            $expected['fr'],
+            sprintf($text_fr->nget('%u line', '%u lines', $n), $n),
+            'existing plural form in Fr'
+        );
+        $this->assertEquals(
+            $expected['ru'],
+            sprintf($text_ru->nget('%u line', '%u lines', $n), $n),
+            'existing plural form in Ru'
+        );
 
         $this->assertEquals($unknown, $text_ru->nget($unknown, $unknown, $n), 'non-existent plural form');
     }
@@ -100,9 +143,21 @@ class TextTest extends TestCase
 
         $unknown = 'non-existent ' . rand(100, 999);
 
-        $this->assertEquals($expected['en'], sprintf($text_en->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in En');
-        $this->assertEquals($expected['fr'], sprintf($text_fr->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in Fr');
-        $this->assertEquals($expected['ru'], sprintf($text_ru->npget('line', '%u sent', '%u sent', $n), $n), 'existing plural form using context in Ru');
+        $this->assertEquals(
+            $expected['en'],
+            sprintf($text_en->npget('line', '%u sent', '%u sent', $n), $n),
+            'existing plural form using context in En'
+        );
+        $this->assertEquals(
+            $expected['fr'],
+            sprintf($text_fr->npget('line', '%u sent', '%u sent', $n), $n),
+            'existing plural form using context in Fr'
+        );
+        $this->assertEquals(
+            $expected['ru'],
+            sprintf($text_ru->npget('line', '%u sent', '%u sent', $n), $n),
+            'existing plural form using context in Ru'
+        );
 
         $this->assertEquals($unknown, $text_en->npget('line', $unknown, $unknown, $n), 'non-existent plural form');
     }

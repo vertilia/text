@@ -4,7 +4,9 @@ namespace Vertilia\Text\Tests\Locale;
 
 class MessagesEn extends \Vertilia\Text\Text
 {
-    protected array $translations = array (
+    protected array $translations =
+array (
+  '6176c157' => 'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
   '333c08d9' => 'An apple',
   86727238 => 'This is a
 multiline

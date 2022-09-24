@@ -43,7 +43,8 @@ printf(<<<'EOT'
     %s
     class %s extends %s
     {
-        protected %s$translations = %s;%s
+        protected %s$translations =
+    %s;%s
     }
 
     EOT,
@@ -229,25 +230,30 @@ class PoLineProcessor
         $this->buffer = '';
     }
 
+    protected function strFormat(string $msg): string
+    {
+        return preg_replace('/(^|[^\\\])\$/', '$1\\\\$', $msg);
+    }
+
     protected function saveTranslation(): void
     {
-        eval(sprintf('$this->msgid = "%s";', $this->msgid));
+        eval(sprintf('$this->msgid = "%s";', $this->strFormat($this->msgid)));
 
         $id = $this->msgid;
 
         if (strlen($this->msgctxt)) {
-            eval(sprintf('$this->msgctx = "%s";', $this->msgctxt));
+            eval(sprintf('$this->msgctx = "%s";', $this->strFormat($this->msgctxt)));
             $id .= "\f$this->msgctxt";
         }
 
         if ($this->msgstr_plural) {
-            eval(sprintf('$this->msgid_plural = "%s";', $this->msgid_plural));
+            eval(sprintf('$this->msgid_plural = "%s";', $this->strFormat($this->msgid_plural)));
             $id .= "\f$this->msgid_plural";
 
             foreach ($this->msgstr_plural as $n => $str) {
                 $idn = "$id\f$n";
                 $hash = hash('crc32b', $idn);
-                eval(sprintf('$str = "%s";', $str));
+                eval(sprintf('$str = "%s";', $this->strFormat($str)));
 
                 if (empty($this->translations[$hash])) {
                     $this->translations[$hash] = $str;
@@ -259,7 +265,7 @@ class PoLineProcessor
             }
         } else {
             $hash = hash('crc32b', $id);
-            eval(sprintf('$this->msgstr = "%s";', $this->msgstr));
+            eval(sprintf('$this->msgstr = "%s";', $this->strFormat($this->msgstr)));
 
             if (empty($this->translations[$hash])) {
                 $this->translations[$hash] = $this->msgstr;

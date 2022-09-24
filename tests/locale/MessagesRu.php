@@ -4,7 +4,9 @@ namespace Vertilia\Text\Tests\Locale;
 
 class MessagesRu extends \Vertilia\Text\Text
 {
-    protected array $translations = array (
+    protected array $translations =
+array (
+  '6176c157' => 'Кавычки: \'апострофы\', "кавычки"; обработка переменных: $i, ${i}, {$i}; форматы printf: %s, %2$s',
   '333c08d9' => 'Яблоко',
   86727238 => 'Вот это
 многострочный

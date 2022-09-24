@@ -4,7 +4,9 @@ namespace Vertilia\Text\Tests\Locale;
 
 class MessagesFr extends \Vertilia\Text\Text
 {
-    protected array $translations = array (
+    protected array $translations =
+array (
+  '6176c157' => 'Guillemets: \'apostrophes\', "quotes"; interprétation de vars: $i, ${i}, {$i}; formats printf: %s, %2$s',
   '333c08d9' => 'Une pomme',
   86727238 => 'Ceci est
 une chaîne

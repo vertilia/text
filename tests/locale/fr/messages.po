@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-10 01:43+0200\n"
+"POT-Creation-Date: 2022-09-24 17:42+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Stas Trefilov <stas.trefilov@gmail.com>\n"
+"Last-Translator: dotgit <stas@vertilia.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +17,20 @@ msgstr ""
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:44 TextTest.php:45 TextTest.php:46
+#: TextTest.php:42 TextTest.php:43
+#, php-format
+msgid ""
+"Quotes: 'apostrophes', \"quotes\"; var parsing: $i, ${i}, {$i}; printf "
+"formats: %s, %2$s"
+msgstr ""
+"Guillemets: 'apostrophes', \"quotes\"; interprétation de vars: $i, ${i}, "
+"{$i}; formats printf: %s, %2$s"
+
+#: TextTest.php:46 TextTest.php:47 TextTest.php:48
 msgid "An apple"
 msgstr "Une pomme"
 
-#: TextTest.php:48 TextTest.php:49 TextTest.php:50
+#: TextTest.php:67 TextTest.php:72 TextTest.php:77
 msgid ""
 "This is a\n"
 "multiline\n"
@@ -31,25 +40,22 @@ msgstr ""
 "une chaîne\n"
 "multiligne"
 
-#: TextTest.php:54 TextTest.php:55 TextTest.php:56
+#: TextTest.php:83 TextTest.php:84 TextTest.php:85
 msgctxt "grass"
 msgid "Green"
 msgstr "Verte"
 
-#: TextTest.php:74 TextTest.php:75 TextTest.php:76
+#: TextTest.php:105 TextTest.php:110 TextTest.php:115
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
 msgstr[0] "%u ligne"
 msgstr[1] "%u lignes"
 
-#: TextTest.php:103 TextTest.php:104 TextTest.php:105
+#: TextTest.php:146 TextTest.php:151 TextTest.php:156
 #, php-format
 msgctxt "line"
 msgid "%u sent"
 msgid_plural "%u sent"
 msgstr[0] "%u envoyée"
 msgstr[1] "%u envoyées"
-
-#~ msgid "Next"
-#~ msgstr "Suivant"
