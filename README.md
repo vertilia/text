@@ -136,9 +136,9 @@ Now it's up to you to create translations for other languages. From now on, your
 follow the following path:
 ```mermaid
 graph
-    A[Add/Update messages wrapped by `Text` methods] -->| gettext | B
-    B[Update `.po` files] -->| po2php | C
-    C[Update `.php` files] -->| Autoloader | A
+    A[Add/Update messages wrapped by Text methods] -->|gettext| B
+    B[Update .po files] -->|po2php| C
+    C[Update .php files] -->|Autoloader| A
 ```
 
 ## Process overview
