@@ -1,6 +1,7 @@
 {
   "name": "vertilia/text",
-  "description": "Translations via gettext",
+  "description": "Translations via gettext and PO format",
+  "keywords": ["gettext", "i18n", "translation", "po", "php"],
   "license": "BSD-2-Clause",
   "type": "library",
   "autoload": {
