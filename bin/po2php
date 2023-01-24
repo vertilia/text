@@ -242,7 +242,7 @@ class PoLineProcessor
         $id = $this->msgid;
 
         if (strlen($this->msgctxt)) {
-            eval(sprintf('$this->msgctx = "%s";', $this->strFormat($this->msgctxt)));
+            eval(sprintf('$this->msgctxt = "%s";', $this->strFormat($this->msgctxt)));
             $id .= "\f$this->msgctxt";
         }
 
