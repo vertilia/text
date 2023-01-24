@@ -21,14 +21,14 @@ class Text implements TextInterface
     }
 
     /**
-     * Defines message hash, uses crc32b algo for better portability.
+     * Defines message hash, uses crc32c algo for better portability.
      *
      * @param string $message
      * @return string
      */
     public function hash(string $message): string
     {
-        return hash('crc32b', $message);
+        return hash('crc32c', $message);
     }
 
     /**
