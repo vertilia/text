@@ -6,16 +6,16 @@ class MessagesEn extends \Vertilia\Text\Text
 {
     protected array $translations =
 array (
-  '6176c157' => 'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
-  '333c08d9' => 'An apple',
-  86727238 => 'This is a
+  'd0f0e2a5' => 'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
+  'f67ebb98' => 'An apple',
+  '4ad68324' => 'This is a
 multiline
 string',
-  '2ad31d3c' => 'Green',
-  '4dc6bfa8' => '%u line',
-  '3ac18f3e' => '%u lines',
-  '98177c58' => '%u sent',
-  'ef104cce' => '%u sent',
+  '0aabfa28' => 'Green',
+  'ccf6a32c' => '%u line',
+  '3e9d202f' => '%u lines',
+  '95e6bcfe' => '%u sent',
+  '678d3ffd' => '%u sent',
 );
 
     protected function plural(int $n): int
