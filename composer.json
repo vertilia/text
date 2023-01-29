@@ -14,12 +14,6 @@
       "Vertilia\\Text\\Tests\\Locale\\": "tests/locale/"
     }
   },
-  "config": {
-    "optimize-autoloader": true,
-    "platform": {
-      "php": "7.4"
-    }
-  },
   "require": {
     "php": ">=7.4"
   },
