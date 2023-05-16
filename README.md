@@ -112,7 +112,7 @@ To do this you'll run the bundled `po2php` command (see examples [below](#po2php
 `locale-src/MessagesFr.php` file:
 
 ```shell
-vendor/vertilia/text/bin/po2php -n App\\Locale -c MessagesFr \
+vendor/bin/po2php -n App\\Locale -c MessagesFr \
   locale/fr_FR/LC_MESSAGES/messages.po \
   >locale-src/MessagesFr.php
 ```
@@ -371,7 +371,7 @@ OPTIONS:
 #### Example 1: generate `MessagesRu` catalog in `tests/locale`
 
 ```shell
-vendor/vertilia/text/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
+vendor/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
   tests/locale/ru_RU/LC_MESSAGES/messages.po \
   >tests/locale/MessagesRu.php
 ```
@@ -379,8 +379,8 @@ vendor/vertilia/text/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
 #### Example 2: generate `MessagesRu` catalog in `tests/locale` with `docker`
 
 ```shell
-docker run --rm --volume $PWD:/app php \
-  php /app/vendor/vertilia/text/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
+docker run --rm --volume "$PWD":/app php \
+  php /app/vendor/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
   /app/tests/locale/ru_RU/LC_MESSAGES/messages.po \
   >tests/locale/MessagesRu.php
 ```
