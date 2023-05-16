@@ -1,9 +1,9 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 declare(strict_types=1);
 
 // script usage:
-// vendor/vertilia/text/bin/po2php -c MessagesFr locale/fr/messages.po >src/MessagesFr.php
+// vendor/bin/po2php -c MessagesFr locale/fr/messages.po >src/MessagesFr.php
 
 $conf = new Configurator($argv);
 

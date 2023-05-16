@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
  *
  * using docker:
- * $docker run --rm --volume $PWD:/app php php /app/bin/po2php ... /app/tests/locale/fr/tests.po ...
+ * $docker run --rm -v "$PWD":/app php /app/bin/po2php -n ... -c ... /app/tests/locale/fr/messages.po >...
  *
  * N.B. updated plural rule in locale/ru/tests.po to match php (pre-v8) ternary operator precedence, different from C
  */

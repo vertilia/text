@@ -355,7 +355,7 @@ production hosts, so you will most likely include the following line into your `
 ## `po2php` reference
 
 ```shell
-./po2php --help
+vendor/bin/po2php --help
 ```
 ```
 Usage: po2php [OPTIONS] messages.po
@@ -380,7 +380,7 @@ vendor/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
 
 ```shell
 docker run --rm --volume "$PWD":/app php \
-  php /app/vendor/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
+  /app/vendor/bin/po2php -n App\\Tests\\Locale -c MessagesRu \
   /app/tests/locale/ru_RU/LC_MESSAGES/messages.po \
   >tests/locale/MessagesRu.php
 ```
