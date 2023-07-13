@@ -1,0 +1,101 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2023-07-13T01:18:56+00:00\n"
+
+#. tagged comment of type /*
+#. tagged comment of type //
+#. tagged comment of type #
+#: tests/xtext-test.php:13 tests/xtext-test.php:14 tests/xtext-test.php:15
+#: tests/xtext-test.php:16
+msgid "simple $string"
+msgstr ""
+
+#: tests/xtext-test.php:19 tests/xtext-test.php:20
+msgctxt "context"
+msgid "simple message"
+msgstr ""
+
+#: tests/xtext-test.php:22 tests/xtext-test.php:23 tests/xtext-test.php:24
+#: tests/xtext-test.php:32 tests/xtext-test.php:33
+msgid "single form"
+msgid_plural "plural form"
+msgstr[0] ""
+msgstr[1] ""
+
+#: tests/xtext-test.php:26 tests/xtext-test.php:27
+msgctxt "context"
+msgid "single form"
+msgid_plural "plural form"
+msgstr[0] ""
+msgstr[1] ""
+
+#: tests/xtext-test.php:29 tests/xtext-test.php:30
+msgid "simple message"
+msgstr ""
+
+#: tests/xtext-test.php:35
+msgid ""
+"complex \n"
+"\"$string\""
+msgstr ""
+
+#: tests/xtext-test.php:37
+msgid ""
+"complex and a very long message containing several paragraphs. Every paragraph i"
+"s terminated by a new line character\n"
+"\"$string\" is then continued on a new line and may end with a new line\n"
+msgstr ""
+
+#: tests/xtext-test.php:39
+msgid ""
+"single quoted\n"
+"$string"
+msgstr ""
+
+#: tests/xtext-test.php:42
+msgid ""
+"double quoted\n"
+"$string"
+msgstr ""
+
+#: tests/xtext-test.php:45
+msgid ""
+"simple\n"
+"$heredoc"
+msgstr ""
+
+#: tests/xtext-test.php:51
+msgid ""
+"double quoted simple\n"
+"$heredoc"
+msgstr ""
+
+#: tests/xtext-test.php:57
+msgid ""
+"simple\n"
+"$nowdoc"
+msgstr ""
+
+#: tests/xtext-test.php:63
+msgid ""
+"indented\n"
+"$heredoc"
+msgstr ""
+
+#: tests/xtext-test.php:69
+msgid ""
+"double quoted indented\n"
+"$heredoc"
+msgstr ""
+
+#: tests/xtext-test.php:75
+msgid "indented $nowdoc"
+msgstr ""
+
+#: tests/xtext-test.php:80
+msgctxt "test"
+msgid "indented $nowdoc"
+msgid_plural "plural"
+msgstr[0] ""
+msgstr[1] ""
+

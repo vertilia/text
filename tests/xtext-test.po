@@ -1,0 +1,134 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2023-07-13T01:18:56+00:00\n"
+"PO-Revision-Date: 2023-07-13 03:19+0200\n"
+"Last-Translator: dotgit <stas@vertilia.com>\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+"X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: xtext-test.php\n"
+
+#. tagged comment of type /*
+#. tagged comment of type //
+#. tagged comment of type #
+#: tests/xtext-test.php:13 tests/xtext-test.php:14 tests/xtext-test.php:15
+#: tests/xtext-test.php:16
+msgid "simple $string"
+msgstr "simple $string"
+
+#: tests/xtext-test.php:19 tests/xtext-test.php:20
+msgctxt "context"
+msgid "simple message"
+msgstr "simple message"
+
+#: tests/xtext-test.php:22 tests/xtext-test.php:23 tests/xtext-test.php:24
+#: tests/xtext-test.php:32 tests/xtext-test.php:33
+msgid "single form"
+msgid_plural "plural form"
+msgstr[0] "single form"
+msgstr[1] "plural form"
+
+#: tests/xtext-test.php:26 tests/xtext-test.php:27
+msgctxt "context"
+msgid "single form"
+msgid_plural "plural form"
+msgstr[0] "single form"
+msgstr[1] "plural form"
+
+#: tests/xtext-test.php:29 tests/xtext-test.php:30
+msgid "simple message"
+msgstr "simple message"
+
+#: tests/xtext-test.php:35
+msgid ""
+"complex \n"
+"\"$string\""
+msgstr ""
+"complex \n"
+"\"$string\""
+
+#: tests/xtext-test.php:37
+msgid ""
+"complex and a very long message containing several paragraphs. Every "
+"paragraph is terminated by a new line character\n"
+"\"$string\" is then continued on a new line and may end with a new "
+"line\n"
+msgstr ""
+"complex and a very long message containing several paragraphs. Every "
+"paragraph is terminated by a new line character\n"
+"\"$string\" is then continued on a new line and may end with a new "
+"line\n"
+
+#: tests/xtext-test.php:39
+msgid ""
+"single quoted\n"
+"$string"
+msgstr ""
+"single quoted\n"
+"$string"
+
+#: tests/xtext-test.php:42
+msgid ""
+"double quoted\n"
+"$string"
+msgstr ""
+"double quoted\n"
+"$string"
+
+#: tests/xtext-test.php:45
+msgid ""
+"simple\n"
+"$heredoc"
+msgstr ""
+"simple\n"
+"$heredoc"
+
+#: tests/xtext-test.php:51
+msgid ""
+"double quoted simple\n"
+"$heredoc"
+msgstr ""
+"double quoted simple\n"
+"$heredoc"
+
+#: tests/xtext-test.php:57
+msgid ""
+"simple\n"
+"$nowdoc"
+msgstr ""
+"simple\n"
+"$nowdoc"
+
+#: tests/xtext-test.php:63
+msgid ""
+"indented\n"
+"$heredoc"
+msgstr ""
+"indented\n"
+"$heredoc"
+
+#: tests/xtext-test.php:69
+msgid ""
+"double quoted indented\n"
+"$heredoc"
+msgstr ""
+"double quoted indented\n"
+"$heredoc"
+
+#: tests/xtext-test.php:75
+msgid "indented $nowdoc"
+msgstr "indented $nowdoc"
+
+#: tests/xtext-test.php:80
+msgctxt "test"
+msgid "indented $nowdoc"
+msgid_plural "plural"
+msgstr[0] "indented $nowdoc"
+msgstr[1] "plural"

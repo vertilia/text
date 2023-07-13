@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 17:42+0200\n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2023-07-13T01:13:12+00:00\n"
+"PO-Revision-Date: 2023-07-13 03:28+0200\n"
 "Last-Translator: dotgit <stas@vertilia.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
 "Language: en\n"
@@ -13,11 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: ../..\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:42 TextTest.php:43
+#: TextTest.php:34 TextTest.php:35
 #, php-format
 msgid ""
 "Quotes: 'apostrophes', \"quotes\"; var parsing: $i, ${i}, {$i}; printf "
@@ -26,11 +26,15 @@ msgstr ""
 "Quotes: 'apostrophes', \"quotes\"; var parsing: $i, ${i}, {$i}; printf "
 "formats: %s, %2$s"
 
-#: TextTest.php:46 TextTest.php:47 TextTest.php:48
+#: TextTest.php:40 TextTest.php:41 TextTest.php:42
 msgid "An apple"
 msgstr "An apple"
 
-#: TextTest.php:67 TextTest.php:72 TextTest.php:77
+#: TextTest.php:45 TextTest.php:54 TextTest.php:63
+msgid "A green apple"
+msgstr "A green apple"
+
+#: TextTest.php:88 TextTest.php:93 TextTest.php:98
 msgid ""
 "This is a\n"
 "multiline\n"
@@ -40,19 +44,19 @@ msgstr ""
 "multiline\n"
 "string"
 
-#: TextTest.php:83 TextTest.php:84 TextTest.php:85
+#: TextTest.php:104 TextTest.php:105 TextTest.php:106
 msgctxt "grass"
 msgid "Green"
 msgstr "Green"
 
-#: TextTest.php:105 TextTest.php:110 TextTest.php:115
+#: TextTest.php:126 TextTest.php:131 TextTest.php:136
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
 msgstr[0] "%u line"
 msgstr[1] "%u lines"
 
-#: TextTest.php:146 TextTest.php:151 TextTest.php:156
+#: TextTest.php:167 TextTest.php:172 TextTest.php:177
 #, php-format
 msgctxt "line"
 msgid "%u sent"

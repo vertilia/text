@@ -3,20 +3,12 @@
 namespace Vertilia\Text\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Vertilia\Text\Text;
 
 /**
- * @coversDefaultClass \Vertilia\Text\Text
- * to generate MessagesEn catalog:
- * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesEn tests/locale/en/messages.po >tests/locale/MessagesEn.php
- * to generate MessagesFr catalog:
- * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesFr tests/locale/fr/messages.po >tests/locale/MessagesFr.php
- * to generate MessagesRu catalog:
- * $ bin/po2php -n Vertilia\\Text\\Tests\\Locale -c MessagesRu tests/locale/ru/messages.po >tests/locale/MessagesRu.php
- *
- * using docker:
- * $docker run --rm -v "$PWD":/app php /app/bin/po2php -n ... -c ... /app/tests/locale/fr/messages.po >...
- *
- * N.B. updated plural rule in locale/ru/tests.po to match php (pre-v8) ternary operator precedence, different from C
+ * @coversDefaultClass Text
+ * N.B. updated plural rule in locale/ru/messages.po to match php (pre-v8) ternary operator precedence, different from C
+ * @see README.md
  */
 class TextTest extends TestCase
 {
@@ -25,16 +17,16 @@ class TextTest extends TestCase
     /**
      * @covers ::_
      * @covers ::pget
-     * @dataProvider _PgetProvider
+     * @dataProvider provider_Pget
      */
     public function test_Pget($expected, $actual, $comment)
     {
-        $this->assertEquals($expected, $actual, $comment);
+        $this->assertSame($expected, $actual, $comment);
     }
 
-    public function _PgetProvider()
+    public static function provider_Pget(): array
     {
-        $xx = new \Vertilia\Text\Text();
+        $xx = new Text();
         $text_en = new Locale\MessagesEn();
         $text_fr = new Locale\MessagesFr();
         $text_ru = new Locale\MessagesRu();
@@ -48,6 +40,33 @@ class TextTest extends TestCase
             ['An apple', $text_en->_('An apple'), 'existing translation in En'],
             ['Une pomme', $text_fr->_('An apple'), 'existing translation in Fr'],
             ['Яблоко', $text_ru->_('An apple'), 'existing translation in Ru'],
+            [
+                'A green apple',
+                $text_en->_(
+                    <<<'EOT'
+                    A green apple
+                    EOT
+                ),
+                'existing translation in En, NowDoc format'
+            ],
+            [
+                'Une pomme verte',
+                $text_fr->_(
+                    <<<'EOT'
+                    A green apple
+                    EOT
+                ),
+                'existing translation in Fr, NowDoc format'
+            ],
+            [
+                'Зелёное яблоко',
+                $text_ru->_(
+                    <<<'EOT'
+                    A green apple
+                    EOT
+                ),
+                'existing translation in Ru, NowDoc format'
+            ],
             [
                 'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
                 $text_en->_($msg1),
@@ -92,7 +111,7 @@ class TextTest extends TestCase
 
     /**
      * @covers ::nget
-     * @dataProvider ngetProvider
+     * @dataProvider providerNget
      */
     public function testNget($expected, $n)
     {
@@ -102,26 +121,26 @@ class TextTest extends TestCase
 
         $unknown = 'non-existent ' . rand(100, 999);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expected['en'],
             sprintf($text_en->nget('%u line', '%u lines', $n), $n),
             'existing plural form in En'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $expected['fr'],
             sprintf($text_fr->nget('%u line', '%u lines', $n), $n),
             'existing plural form in Fr'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $expected['ru'],
             sprintf($text_ru->nget('%u line', '%u lines', $n), $n),
             'existing plural form in Ru'
         );
 
-        $this->assertEquals($unknown, $text_ru->nget($unknown, $unknown, $n), 'non-existent plural form');
+        $this->assertSame($unknown, $text_ru->nget($unknown, $unknown, $n), 'non-existent plural form');
     }
 
-    public function ngetProvider()
+    public static function providerNget(): array
     {
         return [
             'zero lines' => [['en' => '0 lines', 'fr' => '0 ligne', 'ru' => '0 строк'], 0],
@@ -133,7 +152,7 @@ class TextTest extends TestCase
 
     /**
      * @covers ::npget
-     * @dataProvider npgetProvider
+     * @dataProvider providerNpget
      */
     public function testNpget($expected, $n)
     {
@@ -143,26 +162,26 @@ class TextTest extends TestCase
 
         $unknown = 'non-existent ' . rand(100, 999);
 
-        $this->assertEquals(
+        $this->assertSame(
             $expected['en'],
             sprintf($text_en->npget('line', '%u sent', '%u sent', $n), $n),
             'existing plural form using context in En'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $expected['fr'],
             sprintf($text_fr->npget('line', '%u sent', '%u sent', $n), $n),
             'existing plural form using context in Fr'
         );
-        $this->assertEquals(
+        $this->assertSame(
             $expected['ru'],
             sprintf($text_ru->npget('line', '%u sent', '%u sent', $n), $n),
             'existing plural form using context in Ru'
         );
 
-        $this->assertEquals($unknown, $text_en->npget('line', $unknown, $unknown, $n), 'non-existent plural form');
+        $this->assertSame($unknown, $text_en->npget('line', $unknown, $unknown, $n), 'non-existent plural form');
     }
 
-    public function npgetProvider()
+    public static function providerNpget(): array
     {
         return [
             'zero sent (line)' => [['en' => '0 sent', 'fr' => '0 envoyée', 'ru' => '0 отправлено'], 0],

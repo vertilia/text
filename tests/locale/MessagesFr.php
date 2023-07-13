@@ -8,6 +8,7 @@ class MessagesFr extends \Vertilia\Text\Text
 array (
   'd0f0e2a5' => 'Guillemets: \'apostrophes\', "quotes"; interprétation de vars: $i, ${i}, {$i}; formats printf: %s, %2$s',
   'f67ebb98' => 'Une pomme',
+  'ea7a212a' => 'Une pomme verte',
   '4ad68324' => 'Ceci est
 une chaîne
 multiligne',

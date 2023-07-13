@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2023-07-13T01:13:12+00:00\n"
+
+#: TextTest.php:34 TextTest.php:35
+#, php-format
+msgid ""
+"Quotes: 'apostrophes', \"quotes\"; var parsing: $i, ${i}, {$i}; printf formats: %s"
+", %2$s"
+msgstr ""
+
+#: TextTest.php:40 TextTest.php:41 TextTest.php:42
+msgid "An apple"
+msgstr ""
+
+#: TextTest.php:45 TextTest.php:54 TextTest.php:63
+msgid "A green apple"
+msgstr ""
+
+#: TextTest.php:88 TextTest.php:93 TextTest.php:98
+msgid ""
+"This is a\n"
+"multiline\n"
+"string"
+msgstr ""
+
+#: TextTest.php:104 TextTest.php:105 TextTest.php:106
+msgctxt "grass"
+msgid "Green"
+msgstr ""
+
+#: TextTest.php:126 TextTest.php:131 TextTest.php:136
+#, php-format
+msgid "%u line"
+msgid_plural "%u lines"
+msgstr[0] ""
+msgstr[1] ""
+
+#: TextTest.php:167 TextTest.php:172 TextTest.php:177
+#, php-format
+msgctxt "line"
+msgid "%u sent"
+msgid_plural "%u sent"
+msgstr[0] ""
+msgstr[1] ""
+

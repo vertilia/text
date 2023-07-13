@@ -2,23 +2,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 17:49+0200\n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2023-07-13T01:13:12+00:00\n"
+"PO-Revision-Date: 2023-07-13 03:28+0200\n"
 "Last-Translator: dotgit <stas@vertilia.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==0 || n%10>4 || (n%100>=11 && n"
-"%100<=14) ? 2 : (n%10 != 1));\n"
+"Plural-Forms: nplurals=3; plural=(n%10==0 || n%10>4 || (n%100>=11 && "
+"n%100<=14) ? 2 : (n%10 != 1));\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-Basepath: ../..\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Poedit-KeywordsList: pget:1c,2;nget:1,2;npget:1c,2,3\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: TextTest.php:42 TextTest.php:43
+#: TextTest.php:34 TextTest.php:35
 #, php-format
 msgid ""
 "Quotes: 'apostrophes', \"quotes\"; var parsing: $i, ${i}, {$i}; printf "
@@ -27,11 +27,15 @@ msgstr ""
 "Кавычки: 'апострофы', \"кавычки\"; обработка переменных: $i, ${i}, {$i}; "
 "форматы printf: %s, %2$s"
 
-#: TextTest.php:46 TextTest.php:47 TextTest.php:48
+#: TextTest.php:40 TextTest.php:41 TextTest.php:42
 msgid "An apple"
 msgstr "Яблоко"
 
-#: TextTest.php:67 TextTest.php:72 TextTest.php:77
+#: TextTest.php:45 TextTest.php:54 TextTest.php:63
+msgid "A green apple"
+msgstr "Зелёное яблоко"
+
+#: TextTest.php:88 TextTest.php:93 TextTest.php:98
 msgid ""
 "This is a\n"
 "multiline\n"
@@ -41,12 +45,12 @@ msgstr ""
 "многострочный\n"
 "текст"
 
-#: TextTest.php:83 TextTest.php:84 TextTest.php:85
+#: TextTest.php:104 TextTest.php:105 TextTest.php:106
 msgctxt "grass"
 msgid "Green"
 msgstr "Зелёная"
 
-#: TextTest.php:105 TextTest.php:110 TextTest.php:115
+#: TextTest.php:126 TextTest.php:131 TextTest.php:136
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
@@ -54,7 +58,7 @@ msgstr[0] "%u строка"
 msgstr[1] "%u строки"
 msgstr[2] "%u строк"
 
-#: TextTest.php:146 TextTest.php:151 TextTest.php:156
+#: TextTest.php:167 TextTest.php:172 TextTest.php:177
 #, php-format
 msgctxt "line"
 msgid "%u sent"

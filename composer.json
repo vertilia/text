@@ -18,7 +18,11 @@
     "php": ">=7.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "*"
+    "nikic/php-parser": "*",
+    "phpunit/phpunit": "^9"
   },
-  "bin": ["bin/po2php"]
+  "bin": [
+    "bin/po2php",
+    "bin/xtext"
+  ]
 }

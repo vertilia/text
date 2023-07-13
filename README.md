@@ -8,9 +8,13 @@ This library is intended to continue using gettext as project internationalizati
 methodology but eliminate dependency on complex target system configuration and on `gettext` php extension. This latter
 may become unsuitable for specific environments.
 
-PO catalogue (representing a gettext domain), extracted from the codebase by standard gettext method is then transformed
-by the bundled `po2php` tool to a native `.php` class. This class keeps translations in memory and implements
-language-specific rules as native php code.
+`xgettext` extractor from standard gettext toolchain does not handle correctly PHP heredoc/nowdoc syntax on all systems.
+Here we provide a replacement `xtext` script that extracts strings into a POT format, which may be used as a source file
+for your gettext workflow.
+
+PO catalogue (representing a gettext domain), extracted from the codebase (by standard gettext method or using `xtext`)
+is then transformed by the bundled `po2php` tool to a native `.php` class. This class keeps translations in memory and
+implements language-specific rules as native php code.
 
 Simple messages are maintained via the `_()` method, plural forms and contexts are maintained via corresponding
 `nget()`, `pget()` and `npget()` methods.
@@ -28,7 +32,8 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 - translations are stored in `.php` files which allows for a quick autoloading and opcode caching, minimized runtime
   effort to get translation into memory and finding translation for source string;
 - stable and predictable work in multiprocess web environments, not tied to host system configuration and currently
-  installed system locales.
+  installed system locales;
+- bundled tools to correctly handle PHP heredoc/nowdoc syntax and to compile .PO files to native php code.
 
 ## Installation
 
@@ -52,7 +57,6 @@ Programming in C with gettext historically consists of the following phases (sim
 6. copy `.mo` file into your code, so that now gettext functions (mentioned in 2.) could use them to extract
    translations for their arguments
 7. if new language is added to application, assure the corresponding locale is configured on target system
-8. go to 2.
 
 In `Text` we can bypass phases 5., 6. and 7., and compile `.po` files directly into `.php` classes, containing
 translated strings and plural forms rules for target language.
@@ -65,14 +69,14 @@ For large codebases, as with normal gettext, you can break down translations on 
 different `.po` files per domain.
 
 When you start the project, and while you have no `.po` file yet, you can use the base `\Vertilia\Text\Text` object to
-provide translated text. It will simply return the passes argument as translated message, which is mostly ok for
+provide translated text. It will simply return the passed argument as translated message, which is mostly ok for
 debugging purposes. Even in its basic form, it will already be smart enough to correctly handle plural forms for English
 messages:
 
 ```php
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 $t = new Vertilia\Text\Text();
 
@@ -84,7 +88,7 @@ echo $t->npget('page', 'One sent', 'Multiple sent', 5), PHP_EOL; // output: Mult
 ```
 
 When you extract messages from the above code with gettext tools (we highly recommend using widely-available translation
-tools, like [Poedit](https://poedit.net/) or others) you'll produce a text file with `.po` extension containing source
+tools, like [POedit](https://poedit.net/) or others) you'll produce a text file with `.po` extension containing source
 language messages, placeholders for target language translations, say French, and a rule for French plural form
 conversion. After translating the placeholders in `.po` file into French, you normally include the result file in your
 project as `locale/fr_FR/LC_MESSAGES/messages.po`. This is a GNU norm, but with `Text` you may use any folder and
@@ -93,6 +97,8 @@ files and clearly distinguish languages and domains.
 
 > See [Keywords for `xgettext`](#keywords-for-xgettext) below for things to configure when running gettext tools on your
 > codebase.
+
+> See [`xtext` reference](#xtext-reference) below if `xgettext` is not working correctly on your system.
 
 Simplified view of the contents of `messages.po` file for our project:
 
@@ -112,9 +118,9 @@ To do this you'll run the bundled `po2php` command (see examples [below](#po2php
 `locale-src/MessagesFr.php` file:
 
 ```shell
-vendor/bin/po2php -n App\\Locale -c MessagesFr \
+vendor/bin/po2php -n App\\L10n -c MessagesFr \
   locale/fr_FR/LC_MESSAGES/messages.po \
-  >locale-src/MessagesFr.php
+  >src/L10n/MessagesFr.php
 ```
 
 So for now, you generated 2 additional files in your project:
@@ -134,7 +140,7 @@ Now it's time to use the generated `MessagesFr` class instead of the base `Text`
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$t = new App\Locale\MessagesFr();
+$t = new App\L10n\MessagesFr();
 
 echo $t->_('Just a test'), PHP_EOL;                      // output: Juste un test
 echo $t->pget('page', 'Next'), PHP_EOL;                  // output: Suivante
@@ -191,7 +197,7 @@ echo $t->_("Several words"); // output: Several words
 
 #### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
 ```php
-$t = \App\Locale\MessagesRu();
+$t = \App\L10n\MessagesRu();
 echo $t->_("Several words"); // output: Несколько слов
 ```
 
@@ -221,7 +227,7 @@ printf($t->nget("%u word", "%u words", 5), 5); // output: 5 words
 
 #### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
 ```php
-$t = \App\Locale\MessagesRu();
+$t = \App\L10n\MessagesRu();
 printf($t->nget("%u word", "%u words", 1), 1); // output: 1 слово
 printf($t->nget("%u word", "%u words", 2), 2); // output: 2 слова
 printf($t->nget("%u word", "%u words", 5), 5); // output: 5 слов
@@ -254,7 +260,7 @@ printf($t->npget("star", "%u bright", "%u bright", 5), 5); // output: 5 bright
 
 #### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
 ```php
-$t = \App\Locale\MessagesRu();
+$t = \App\L10n\MessagesRu();
 printf($t->npget("star", "%u bright", "%u bright", 1), 1); // output: 1 яркая
 printf($t->npget("star", "%u bright", "%u bright", 2), 2); // output: 2 яркие
 printf($t->npget("star", "%u bright", "%u bright", 5), 5); // output: 5 ярких
@@ -283,7 +289,7 @@ printf($t->npget("star", "It's bright")); // output: It's bright
 
 #### Example 2: `MessagesRu` class created after translating `messages.po` into Russian
 ```php
-$t = \App\Locale\MessagesRu();
+$t = \App\L10n\MessagesRu();
 printf($t->npget("star", "It's bright")); // output: Она яркая
 ```
 
@@ -295,23 +301,18 @@ following configuration should be provided for `xgettext` command line utility:
 xgettext ... --keyword=_ --keyword=pget:1c,2 --keyword=nget:1,2 --keyword=npget:1c,2,3
 ```
 
-GUI utilities like Poedit will provide a configuration screen where the keywords may be specified as the following list:
+GUI utilities like POedit will provide a configuration screen where the keywords may be specified as the following list:
 
-- `_`
-- `pget:1c,2`
 - `nget:1,2`
+- `pget:1c,2`
 - `npget:1c,2,3`
 
 ## Proposed configuration for `composer` and `git`
 
-When producing `Text` classes we recommend you to store them in `locale-src/` folder of your application. Consider the
+When producing `Text` classes we recommend you to store them in `L10n/` folder of your application. Consider the
 following layout (simplified, 3 languages):
 ```
 /app/
-├─ locale─src/
-│  ├─ MessagesEn.php
-│  ├─ MessagesFr.php
-│  └─ MessagesRu.php
 ├─ locale/
 │  ├─ en_US/
 │  │  └─ LC_MESSAGES/
@@ -319,38 +320,90 @@ following layout (simplified, 3 languages):
 │  ├─ fr_FR/
 │  │  └─ LC_MESSAGES/
 │  │     └─ messages.po
-│  └─ ru_RU/
-│     └─ LC_MESSAGES/
-│        └─ messages.po
+│  ├─ ru_RU/
+│  │  └─ LC_MESSAGES/
+│  │     └─ messages.po
+│  └─ messages.pot
 ├─ src/
-│  └─ index.php
+│  ├─ L10n/
+│  │  ├─ MessagesEn.php
+│  │  ├─ MessagesFr.php
+│  │  └─ MessagesRu.php
+│  └─ ...
 ├─ vendor/
 │  ├─ autoload.php
 │  ├─ composer/
 │  └─ vertilia/
+├─ www/
+│  └─ index.php
 ├─ .gitattributes
 └─ composer.json
 ```
 
-Here, your application code is located in `src/` folder and, presuming the application namespace is `App`, messages
-classes namespace is `App\Locale`, your composer `autoload` directive is configured as follows:
+Here, your application code is located in `src/` and `www/` folders and, presuming the application namespace is `App`,
+messages classes namespace is `App\L10n`, your composer `autoload` directive is configured as follows:
 ```json
 {
   "autoload": {
     "psr-4": {
-      "App\\": "src/",
-      "App\\Locale\\": "locale-src/"
+      "App\\": "src/"
     }
   }
 }
 ```
 
-Please note, `locale/` folder storing `.po` files is separated from `locale-src/` folder with `Text` message classes to
+Please note, `locale/` folder storing `.po` files is separated from `L10n/` folder with `Text` message classes to
 simplify exclusion of this folder from the binary version of your application. You don't need intermediate files on
 production hosts, so you will most likely include the following line into your `.gitattributes`:
 ```
 /locale export-ignore
 ```
+
+## `xtext` reference
+
+```shell
+vendor/bin/xtext -h
+```
+```
+Usage: xtext [OPTIONS] FILES,
+OPTIONS:
+-h      Display usage message and quit
+-x EXCLUDE_PATH
+        Pattern to exclude when scanning FILES, may be repeated to
+        provide multiple patterns. Executes before -i.
+-i INCLUDE_PATH
+        Pattern to include when scanning FILES, may be repeated to
+        provide multiple paths. Executes after -x. Default: *
+-c COMMENT_TAG
+        Comment tag to mark extractable comments from the source code.
+        Use empty string to extract all comments
+FILES:
+        A list of one or more file or directory. If directory names are
+        specified, they are scanned recursively. Options -x and -i are
+        used to limit processed files.
+EXAMPLES:
+xtext *.php
+        Scan all .php files in current dir
+xtext -c '' *.php
+        Scan all .php files in current dir, also extract comments
+xtext -x /*/vendor -x /*/tests -i '*.php' -c TRANSLATORS: /app >msg.pot
+        Scan all .php files in /app directory and sub-directories,
+        excluding vendor and tests folders, extract comments starting
+        with TRANSLATORS: tag and write output to msg.pot file
+```
+
+On some systems, `xgettext` tool used to scan php sources and extract translatable strings may break if php files use
+heredoc/nowdoc syntax, especially with indented closing identifier (available since php 7.3).
+
+To allow correct extraction of gettext lines from the sources, bundled `xtext` utility may be used instead. This tool
+will scan the source folders, find the translatable strings and output a POT file, containing all detected strings. It
+maintains the code references for translations and may also include comments that precede calls to corresponding `Text`
+and `gettext` functions in the code.
+
+POedit tool mentioned above may use both methods of updating existing PO files, either by scanning source directories
+with `xgettext` to produce the POT file and transparently merge it with existing translations, or use an existing POT
+file with extracted translations. First method is simpler, but if POedit cannot extract translations from all files in
+your codebase automatically, you may generate the POT file with `xtext` and use it to update translations.
 
 ## `po2php` reference
 
@@ -438,7 +491,7 @@ Examples:
 
 You can find more examples at [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
 
-## Plural forms rules rewrite for specific languages
+## Plural forms rules rewrite for specific languages (before php 8.0)
 
 Ternary condition statement in php before version 8.0 has other associativity than in C, so the default rule in PO file
 for languages using chained ternary operators for plural form selector needs to be corrected with additional parenthesis
@@ -452,7 +505,16 @@ in PO file:
 (n%10==0 || n%10>4 || (n%100>=11 && n%100<=14) ? 2 : (n%10 != 1))
 ```
 
-## Plural forms usage with `sprintf()`
+## Plural forms usage with `printf()`
+
+In brief: to produce lines using plural forms based on a variable value, use the following construct:
+```php
+printf($t->nget("%d file removed", "%d files removed", $n), $n);
+```
+
+Here, the first call to `nget` with `$n` will select corresponding format string either for single or for plural form,
+and then this selected string will be passed to `printf` with another `$n` which will now be inserted in corresponding
+`%d` placeholder.
 
 For detailed discussion see [gettext manual](https://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html).
 
@@ -464,6 +526,27 @@ For detailed discussion see [gettext manual](https://www.gnu.org/software/gettex
 | `ngettext()`       | `nget()`      |
 | `pgettext()`       | `pget()`      |
 | `npgettext()`      | `npget()`     |
+
+Note the lack of domain functions (`dgettext`, ...) Domains in gettext are represented by different translation files,
+so to use a translation from another domain one should instantiate another `Text` object.
+
+Example:
+- `gettext`-style:
+  ```php
+  putenv('LC_ALL=fr_FR');
+  setlocale(LC_ALL, 'fr_FR');
+  bindtextdomain("myPHPApp", "./locale");
+  textdomain("myPHPApp");
+  echo gettext("Welcome to My PHP Application"), "\n";
+  echo dgettext("anotherPHPApp", "Welcome to Another PHP Application"), "\n";
+  ```
+- `Text`-style:
+  ```php
+  $myDomain = \App\L10n\MyPhpAppFr();
+  $anotherDomain = \App\L10n\AnotherPhpAppFr();
+  echo $myDomain->_("Welcome to My PHP Application"), "\n";
+  echo $anotherDomain->_("Welcome to Another PHP Application"), "\n";
+  ```
 
 ## Resources
 

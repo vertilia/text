@@ -1,0 +1,229 @@
+#!/usr/bin/env php
+<?php
+
+include __DIR__ . '/../vendor/autoload.php';
+
+use PhpParser\Node;
+use PhpParser\NodeDumper;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitorAbstract;
+use PhpParser\ParserFactory;
+use Vertilia\Text\PoDomain;
+
+$params = getopt('hx:i:c:', [], $last_opt);
+
+if ($last_opt >= $argc or isset($params['h'])) {
+    printf(
+        <<<'EOT'
+        Usage: %1$s [OPTIONS] FILES,
+        OPTIONS:
+        -h      Display usage message and quit
+        -x EXCLUDE_PATH
+                Pattern to exclude when scanning FILES, may be repeated to
+                provide multiple patterns. Executes before -i.
+        -i INCLUDE_PATH
+                Pattern to include when scanning FILES, may be repeated to
+                provide multiple paths. Executes after -x. Default: *
+        -c COMMENT_TAG
+                Comment tag to mark extractable comments from the source code.
+                Use empty string to extract all comments
+        FILES:
+                A list of one or more file or directory. If directory names are
+                specified, they are scanned recursively. Options -x and -i are
+                used to limit processed files.
+        EXAMPLES:
+        %1$s *.php
+                Scan all .php files in current dir
+        %1$s -c '' *.php
+                Scan all .php files in current dir, also extract comments
+        %1$s -x /*/vendor -x /*/tests -i '*.php' -c TRANSLATORS: /app >msg.pot
+                Scan all .php files in /app directory and sub-directories,
+                excluding vendor and tests folders, extract comments starting
+                with TRANSLATORS: tag and write output to msg.pot file
+
+        EOT,
+        basename($argv[0])
+    );
+    die();
+}
+
+$exclude = isset($params['x']) ? (array)$params['x'] : [];
+$include = isset($params['i']) ? (array)$params['i'] : ['*'];
+$comment = isset($params['c']) ? ($params['c'] === false ? true : $params['c']) : null;
+
+$acceptor_fn = function ($current, $path) use ($exclude, $include) {
+    $skip = false;
+    foreach ($exclude as $excl) {
+        if (fnmatch($excl, $path)) {
+            $skip = true;
+            break;
+        }
+    }
+
+    if (!$skip and $current->isFile()) {
+        $skip = true;
+        foreach ($include as $incl) {
+            if (fnmatch($incl, $path)) {
+                $skip = false;
+                break;
+            }
+        }
+    }
+
+    return !$skip;
+};
+
+class Php2PoVisitor extends NodeVisitorAbstract
+{
+    protected PoDomain $po_file;
+    private string $src_file;
+
+    public function __construct(PoDomain $po_file, string $src_file)
+    {
+        $this->po_file = $po_file;
+        $this->src_file = $src_file;
+    }
+
+    public function enterNode(Node $expr)
+    {
+        if ($expr instanceof Node\Expr\StaticCall
+            or $expr instanceof Node\Expr\MethodCall
+            or $expr instanceof Node\Expr\FuncCall
+        ) {
+            if ($expr->name instanceof Node\Name) {
+                $parts = $expr->name->getParts();
+                $fn = $parts[array_key_last($parts)];
+            } else {
+                $fn = $expr->name;
+            }
+
+            $src = $this->src_file . ':' . $expr->getAttribute('startLine');
+            $comments = $expr->getAttribute('comments');
+            switch ($fn) {
+                case 'gettext':
+                case '_':
+                    // arguments: 1
+                    if ($expr->args[0]->value instanceof Node\Scalar\String_) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgid' => $expr->args[0]->value->value,
+                            'msgstr' => '',
+                        ]);
+                    }
+                    break;
+                case 'nget':
+                case 'ngettext':
+                    // arguments: 1,2
+                    if ($expr->args[0]->value instanceof Node\Scalar\String_
+                        and $expr->args[1]->value instanceof Node\Scalar\String_
+                    ) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgid' => $expr->args[0]->value->value,
+                            'msgid_plural' => $expr->args[1]->value->value,
+                            'msgstr' => ['', ''],
+                        ]);
+                    }
+                    break;
+                case 'pget':
+                    // arguments: 1c,2
+                    if ($expr->args[0]->value instanceof Node\Scalar\String_
+                        and $expr->args[1]->value instanceof Node\Scalar\String_
+                    ) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgctxt' => $expr->args[0]->value->value,
+                            'msgid' => $expr->args[1]->value->value,
+                            'msgstr' => '',
+                        ]);
+                    }
+                    break;
+                case 'npget':
+                    // arguments: 1c,2,3
+                    if ($expr->args[0]->value instanceof Node\Scalar\String_
+                        and $expr->args[1]->value instanceof Node\Scalar\String_
+                        and $expr->args[2]->value instanceof Node\Scalar\String_
+                    ) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgctxt' => $expr->args[0]->value->value,
+                            'msgid' => $expr->args[1]->value->value,
+                            'msgid_plural' => $expr->args[2]->value->value,
+                            'msgstr' => ['', ''],
+                        ]);
+                    }
+                    break;
+                case 'dgettext':
+                case 'dcgettext':
+                    // arguments: 2
+                    if ($expr->args[1]->value instanceof Node\Scalar\String_) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgid' => $expr->args[1]->value->value,
+                            'msgstr' => '',
+                        ]);
+                    }
+                    break;
+                case 'dngettext':
+                case 'dcngettext':
+                    // arguments: 2,3
+                    if ($expr->args[1]->value instanceof Node\Scalar\String_
+                        and $expr->args[2]->value instanceof Node\Scalar\String_
+                    ) {
+                        $this->po_file->addMsg([
+                            '#.' => $comments,
+                            '#:' => $src,
+                            'msgid' => $expr->args[1]->value->value,
+                            'msgid_plural' => $expr->args[2]->value->value,
+                            'msgstr' => ['', ''],
+                        ]);
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+$parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+$dumper = new NodeDumper();
+$po_domain = new PoDomain($comment);
+
+function transform_file(string $filename)
+{
+    global $po_domain, $parser, $dumper;
+
+    $traverser = new NodeTraverser();
+    $traverser->addVisitor(new Php2PoVisitor($po_domain, $filename));
+
+    $ast = $parser->parse(file_get_contents($filename));
+    $traverser->traverse($ast);
+//    echo $dumper->dump($ast), "\n";
+}
+
+for ($i = $last_opt; isset($argv[$i]); $i++) {
+    if (is_dir($argv[$i])) {
+        foreach (
+            new RecursiveIteratorIterator(
+                new RecursiveCallbackFilterIterator(
+                    new RecursiveDirectoryIterator($argv[$i], FilesystemIterator::SKIP_DOTS),
+                    $acceptor_fn
+                )
+            )
+            as $file
+        ) {
+            transform_file($file->getPathname());
+        }
+    } elseif (is_file($argv[$i])) {
+        transform_file($argv[$i]);
+    } else {
+        fprintf(STDERR, "ERROR: cannot access %s on filesystem", $argv[$i]);
+        die();
+    }
+
+    echo $po_domain;
+}
