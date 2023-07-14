@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-07-13T01:18:56+00:00\n"
+"POT-Creation-Date: 2023-07-13T16:16:15+00:00\n"
 
 #. tagged comment of type /*
 #. tagged comment of type //
@@ -10,89 +10,93 @@ msgstr ""
 msgid "simple $string"
 msgstr ""
 
-#: tests/xtext-test.php:19 tests/xtext-test.php:20
+#: tests/xtext-test.php:17
+msgid "concat $string"
+msgstr ""
+
+#: tests/xtext-test.php:20 tests/xtext-test.php:21
 msgctxt "context"
 msgid "simple message"
 msgstr ""
 
-#: tests/xtext-test.php:22 tests/xtext-test.php:23 tests/xtext-test.php:24
-#: tests/xtext-test.php:32 tests/xtext-test.php:33
+#: tests/xtext-test.php:23 tests/xtext-test.php:24 tests/xtext-test.php:25
+#: tests/xtext-test.php:33 tests/xtext-test.php:34
 msgid "single form"
 msgid_plural "plural form"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tests/xtext-test.php:26 tests/xtext-test.php:27
+#: tests/xtext-test.php:27 tests/xtext-test.php:28
 msgctxt "context"
 msgid "single form"
 msgid_plural "plural form"
 msgstr[0] ""
 msgstr[1] ""
 
-#: tests/xtext-test.php:29 tests/xtext-test.php:30
+#: tests/xtext-test.php:30 tests/xtext-test.php:31
 msgid "simple message"
 msgstr ""
 
-#: tests/xtext-test.php:35
+#: tests/xtext-test.php:36
 msgid ""
 "complex \n"
 "\"$string\""
 msgstr ""
 
-#: tests/xtext-test.php:37
+#: tests/xtext-test.php:38
 msgid ""
 "complex and a very long message containing several paragraphs. Every paragraph i"
 "s terminated by a new line character\n"
 "\"$string\" is then continued on a new line and may end with a new line\n"
 msgstr ""
 
-#: tests/xtext-test.php:39
+#: tests/xtext-test.php:40
 msgid ""
 "single quoted\n"
 "$string"
 msgstr ""
 
-#: tests/xtext-test.php:42
+#: tests/xtext-test.php:43
 msgid ""
 "double quoted\n"
 "$string"
 msgstr ""
 
-#: tests/xtext-test.php:45
+#: tests/xtext-test.php:46
 msgid ""
 "simple\n"
 "$heredoc"
 msgstr ""
 
-#: tests/xtext-test.php:51
+#: tests/xtext-test.php:52
 msgid ""
 "double quoted simple\n"
 "$heredoc"
 msgstr ""
 
-#: tests/xtext-test.php:57
+#: tests/xtext-test.php:58
 msgid ""
 "simple\n"
 "$nowdoc"
 msgstr ""
 
-#: tests/xtext-test.php:63
+#: tests/xtext-test.php:64
 msgid ""
 "indented\n"
 "$heredoc"
 msgstr ""
 
-#: tests/xtext-test.php:69
+#: tests/xtext-test.php:70
 msgid ""
 "double quoted indented\n"
 "$heredoc"
 msgstr ""
 
-#: tests/xtext-test.php:75
+#: tests/xtext-test.php:76
 msgid "indented $nowdoc"
 msgstr ""
 
-#: tests/xtext-test.php:80
+#: tests/xtext-test.php:81
 msgctxt "test"
 msgid "indented $nowdoc"
 msgid_plural "plural"

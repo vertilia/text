@@ -15,8 +15,12 @@ class PoDomain
         $this->line_length = $line_length;
     }
 
-    public function addMsg(array $msg)
+    public function addMsg(array $msg): self
     {
+        if (!isset($msg['msgid'])) {
+            return $this;
+        }
+
         // define unique id
         $msguid = sprintf(
             '%s%s%s',
@@ -24,17 +28,19 @@ class PoDomain
             isset($msg['msgctxt']) ? "\f$msg[msgctxt]" : '',
             isset($msg['msgid_plural']) ? "\f$msg[msgid_plural]" : ''
         );
+
         // add php-format flag if needed
         if (false !== strpos($msguid, '%')) {
             $flag = 'php-format';
             if (isset($msg['#,'])) {
-                if (false === strpos($msg['#,'] ?? '', $flag)) {
+                if (false === strpos($msg['#,'], $flag)) {
                     $msg['#,'] = "$flag,{$msg['#,']}";
                 }
             } else {
                 $msg['#,'] = $flag;
             }
         }
+
         // handle reference
         if (isset($this->messages[$msguid])) {
             if (isset($msg['#:']) and is_scalar($msg['#:'])) {
@@ -46,13 +52,15 @@ class PoDomain
             }
             $this->messages[$msguid] = $msg;
         }
+
+        return $this;
     }
 
-    public function msgTxt(string $msg): string
+    protected function wrapString(string $string): string
     {
-        if (strlen($msg) > $this->line_length or false !== strpos($msg, "\n")) {
+        if (strlen($string) > $this->line_length or false !== strpos($string, "\n")) {
             $ret = ['""'];
-            foreach (explode("\n", $msg) as $block) {
+            foreach (explode("\n", $string) as $block) {
                 $block .= "\n";
                 foreach (mb_str_split($block, $this->line_length) as $line) {
                     $ret[] = sprintf('"%s"', addcslashes($line, "\0..\37\""));
@@ -65,11 +73,11 @@ class PoDomain
             }
             return implode("\n", $ret);
         } else {
-            return sprintf('"%s"', addcslashes($msg, "\0..\37\""));
+            return sprintf('"%s"', addcslashes($string, "\0..\37\""));
         }
     }
 
-    public function commentTxt(string $comment): ?string
+    protected function extractComment(string $comment): ?string
     {
         if (preg_match('%^/\*[\s*]*(.+)\*+/$%s', $comment, $m)
             or preg_match('%^/+(.+)%', $comment, $m)
@@ -80,7 +88,7 @@ class PoDomain
                 $tag_len = strlen($this->comment_tag);
                 if ($tag_len) {
                     if (strncmp($this->comment_tag, $clean_comment, $tag_len) === 0) {
-                        return ltrim(substr($clean_comment, $tag_len));
+                        return $clean_comment;
                     } else {
                         return null;
                     }
@@ -97,59 +105,77 @@ class PoDomain
 
     public function __toString(): string
     {
-        $buffer = [];
-        array_unshift($this->messages, ['msgid' => '', 'msgstr' => sprintf("POT-Creation-Date: %s\n", date('c'))]);
+        // add header if not set
+        if (!isset($this->messages[0])) {
+            array_unshift(
+                $this->messages,
+                [
+                    'msgid' => '',
+                    'msgstr' => sprintf("POT-Creation-Date: %s\n", date('c')),
+                ]
+            );
+        }
+
+        //
+        $records = [];
         foreach ($this->messages as $msg) {
+            $lines = [];
             if (isset($msg['#'])) {
-                $buffer[] = sprintf("# %s\n", $msg['#']);
+                if (is_array($msg['#'])) {
+                    foreach ($msg['#'] as $line) {
+                        $lines[] = sprintf("# %s\n", $line);
+                    }
+                } else {
+                    $lines[] = sprintf("# %s\n", $msg['#']);
+                }
             }
             if (isset($msg['#.'])) {
                 if (is_scalar($msg['#.'])) {
-                    $comment_valid = $this->commentTxt($msg['#.']);
+                    $comment_valid = $this->extractComment($msg['#.']);
                     if (isset($comment_valid)) {
-                        $buffer[] = sprintf("#. %s\n", $comment_valid);
+                        $lines[] = sprintf("#. %s\n", $comment_valid);
                     }
                 } elseif (is_array($msg['#.'])) {
-                    $parts = [];
+                    $comments = [];
                     foreach ($msg['#.'] as $comment) {
-                        $comment_valid = $this->commentTxt($comment);
+                        $comment_valid = $this->extractComment($comment);
                         if (isset($comment_valid)) {
-                            $parts[] = str_replace("\n", "\n#. ", $comment_valid);
+                            $comments[] = str_replace("\n", "\n#. ", $comment_valid);
                         }
                     }
-                    if ($parts) {
-                        $buffer[] = sprintf("#. %s\n", implode("\n#. ", $parts));
+                    if ($comments) {
+                        $lines[] = sprintf("#. %s\n", implode("\n#. ", $comments));
                     }
                 }
             }
             if (isset($msg['#:'])) {
                 $refs = wordwrap(implode(' ', $msg['#:']), $this->line_length);
-                $buffer[] = sprintf("#: %s\n", str_replace("\n", "\n#: ", $refs));
+                $lines[] = sprintf("#: %s\n", str_replace("\n", "\n#: ", $refs));
             }
             if (isset($msg['#,'])) {
-                $buffer[] = sprintf("#, %s\n", $msg['#,']);
+                $lines[] = sprintf("#, %s\n", $msg['#,']);
             }
             if (isset($msg['msgctxt'])) {
-                $buffer[] = sprintf("msgctxt %s\n", $this->msgTxt($msg['msgctxt']));
+                $lines[] = sprintf("msgctxt %s\n", $this->wrapString($msg['msgctxt']));
             }
             if (isset($msg['msgid'])) {
-                $buffer[] = sprintf("msgid %s\n", $this->msgTxt($msg['msgid']));
+                $lines[] = sprintf("msgid %s\n", $this->wrapString($msg['msgid']));
             }
             if (isset($msg['msgid_plural'])) {
-                $buffer[] = sprintf("msgid_plural %s\n", $this->msgTxt($msg['msgid_plural']));
+                $lines[] = sprintf("msgid_plural %s\n", $this->wrapString($msg['msgid_plural']));
             }
             if (isset($msg['msgstr'])) {
                 if (is_array($msg['msgstr'])) {
                     foreach ($msg['msgstr'] as $k => $form) {
-                        $buffer[] = sprintf("msgstr[%u] %s\n", $k, $this->msgTxt($form));
+                        $lines[] = sprintf("msgstr[%u] %s\n", $k, $this->wrapString($form));
                     }
                 } else {
-                    $buffer[] = sprintf("msgstr %s\n", $this->msgTxt($msg['msgstr']));
+                    $lines[] = sprintf("msgstr %s\n", $this->wrapString($msg['msgstr']));
                 }
             }
-            $buffer[] = "\n";
+            $records[] = implode('', $lines);
         }
 
-        return implode('', $buffer);
+        return implode("\n", $records);
     }
 }

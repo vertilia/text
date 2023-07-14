@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vertilia-text-tests\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-13T01:13:12+00:00\n"
-"PO-Revision-Date: 2023-07-13 03:28+0200\n"
+"POT-Creation-Date: 2023-07-14T00:28:46+00:00\n"
+"PO-Revision-Date: 2023-07-14 02:29+0200\n"
 "Last-Translator: dotgit <stas@vertilia.com>\n"
 "Language-Team: Vertilia <stas@vertilia.com>\n"
 "Language: en\n"
@@ -34,7 +34,11 @@ msgstr "An apple"
 msgid "A green apple"
 msgstr "A green apple"
 
-#: TextTest.php:88 TextTest.php:93 TextTest.php:98
+#: TextTest.php:72 TextTest.php:77 TextTest.php:82
+msgid "Concatenated line"
+msgstr "Concatenated line"
+
+#: TextTest.php:103 TextTest.php:108 TextTest.php:113
 msgid ""
 "This is a\n"
 "multiline\n"
@@ -44,19 +48,19 @@ msgstr ""
 "multiline\n"
 "string"
 
-#: TextTest.php:104 TextTest.php:105 TextTest.php:106
+#: TextTest.php:119 TextTest.php:120 TextTest.php:121
 msgctxt "grass"
 msgid "Green"
 msgstr "Green"
 
-#: TextTest.php:126 TextTest.php:131 TextTest.php:136
+#: TextTest.php:141 TextTest.php:146 TextTest.php:151
 #, php-format
 msgid "%u line"
 msgid_plural "%u lines"
 msgstr[0] "%u line"
 msgstr[1] "%u lines"
 
-#: TextTest.php:167 TextTest.php:172 TextTest.php:177
+#: TextTest.php:182 TextTest.php:187 TextTest.php:192
 #, php-format
 msgctxt "line"
 msgid "%u sent"

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-07-13T01:18:56+00:00\n"
-"PO-Revision-Date: 2023-07-13 03:19+0200\n"
+"POT-Creation-Date: 2023-07-13T16:16:15+00:00\n"
+"PO-Revision-Date: 2023-07-13 18:26+0200\n"
 "Last-Translator: dotgit <stas@vertilia.com>\n"
 "Language-Team: \n"
 "Language: en\n"
@@ -23,30 +23,34 @@ msgstr ""
 msgid "simple $string"
 msgstr "simple $string"
 
-#: tests/xtext-test.php:19 tests/xtext-test.php:20
+#: tests/xtext-test.php:17
+msgid "concat $string"
+msgstr "concat $string"
+
+#: tests/xtext-test.php:20 tests/xtext-test.php:21
 msgctxt "context"
 msgid "simple message"
 msgstr "simple message"
 
-#: tests/xtext-test.php:22 tests/xtext-test.php:23 tests/xtext-test.php:24
-#: tests/xtext-test.php:32 tests/xtext-test.php:33
+#: tests/xtext-test.php:23 tests/xtext-test.php:24 tests/xtext-test.php:25
+#: tests/xtext-test.php:33 tests/xtext-test.php:34
 msgid "single form"
 msgid_plural "plural form"
 msgstr[0] "single form"
 msgstr[1] "plural form"
 
-#: tests/xtext-test.php:26 tests/xtext-test.php:27
+#: tests/xtext-test.php:27 tests/xtext-test.php:28
 msgctxt "context"
 msgid "single form"
 msgid_plural "plural form"
 msgstr[0] "single form"
 msgstr[1] "plural form"
 
-#: tests/xtext-test.php:29 tests/xtext-test.php:30
+#: tests/xtext-test.php:30 tests/xtext-test.php:31
 msgid "simple message"
 msgstr "simple message"
 
-#: tests/xtext-test.php:35
+#: tests/xtext-test.php:36
 msgid ""
 "complex \n"
 "\"$string\""
@@ -54,7 +58,7 @@ msgstr ""
 "complex \n"
 "\"$string\""
 
-#: tests/xtext-test.php:37
+#: tests/xtext-test.php:38
 msgid ""
 "complex and a very long message containing several paragraphs. Every "
 "paragraph is terminated by a new line character\n"
@@ -66,7 +70,7 @@ msgstr ""
 "\"$string\" is then continued on a new line and may end with a new "
 "line\n"
 
-#: tests/xtext-test.php:39
+#: tests/xtext-test.php:40
 msgid ""
 "single quoted\n"
 "$string"
@@ -74,7 +78,7 @@ msgstr ""
 "single quoted\n"
 "$string"
 
-#: tests/xtext-test.php:42
+#: tests/xtext-test.php:43
 msgid ""
 "double quoted\n"
 "$string"
@@ -82,7 +86,7 @@ msgstr ""
 "double quoted\n"
 "$string"
 
-#: tests/xtext-test.php:45
+#: tests/xtext-test.php:46
 msgid ""
 "simple\n"
 "$heredoc"
@@ -90,7 +94,7 @@ msgstr ""
 "simple\n"
 "$heredoc"
 
-#: tests/xtext-test.php:51
+#: tests/xtext-test.php:52
 msgid ""
 "double quoted simple\n"
 "$heredoc"
@@ -98,7 +102,7 @@ msgstr ""
 "double quoted simple\n"
 "$heredoc"
 
-#: tests/xtext-test.php:57
+#: tests/xtext-test.php:58
 msgid ""
 "simple\n"
 "$nowdoc"
@@ -106,7 +110,7 @@ msgstr ""
 "simple\n"
 "$nowdoc"
 
-#: tests/xtext-test.php:63
+#: tests/xtext-test.php:64
 msgid ""
 "indented\n"
 "$heredoc"
@@ -114,7 +118,7 @@ msgstr ""
 "indented\n"
 "$heredoc"
 
-#: tests/xtext-test.php:69
+#: tests/xtext-test.php:70
 msgid ""
 "double quoted indented\n"
 "$heredoc"
@@ -122,11 +126,11 @@ msgstr ""
 "double quoted indented\n"
 "$heredoc"
 
-#: tests/xtext-test.php:75
+#: tests/xtext-test.php:76
 msgid "indented $nowdoc"
 msgstr "indented $nowdoc"
 
-#: tests/xtext-test.php:80
+#: tests/xtext-test.php:81
 msgctxt "test"
 msgid "indented $nowdoc"
 msgid_plural "plural"

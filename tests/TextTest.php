@@ -68,6 +68,21 @@ class TextTest extends TestCase
                 'existing translation in Ru, NowDoc format'
             ],
             [
+                'Concatenated line',
+                $text_en->_('Concate' . 'nated' . ' line'),
+                'existing translation in En, concatenation'
+            ],
+            [
+                'Ligne concatenée',
+                $text_fr->_('Concatena' . 'ted' . ' line'),
+                'existing translation in Fr, concatenation'
+            ],
+            [
+                'Сцепленная строка',
+                $text_ru->_('Con' . 'catenated' . ' line'),
+                'existing translation in Ru, concatenation'
+            ],
+            [
                 'Quotes: \'apostrophes\', "quotes"; var parsing: $i, ${i}, {$i}; printf formats: %s, %2$s',
                 $text_en->_($msg1),
                 'special chars in En'

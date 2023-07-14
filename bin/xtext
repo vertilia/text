@@ -84,6 +84,50 @@ class Php2PoVisitor extends NodeVisitorAbstract
         $this->src_file = $src_file;
     }
 
+    public function stringFromConcat(Node $value): ?string
+    {
+        if ($value instanceof Node\Expr\BinaryOp\Concat) {
+            $str_left = $value->left;
+            $str_right = $value->right;
+
+            // verify left
+            if ($str_left instanceof Node\Expr\BinaryOp\Concat) {
+                $str_left = $this->stringFromConcat($str_left);
+            } elseif ($str_left instanceof Node\Scalar\String_) {
+                $str_left = $str_left->value;
+            } else {
+                return null;
+            }
+
+            // verify right
+            if ($str_right instanceof Node\Expr\BinaryOp\Concat) {
+                $str_right = $this->stringFromConcat($str_right);
+            } elseif ($str_right instanceof Node\Scalar\String_) {
+                $str_right = $str_right->value;
+            } else {
+                return null;
+            }
+
+            // both parts are strings
+            if (is_string($str_left) and is_string($str_right)) {
+                return "$str_left$str_right";
+            }
+
+            return null;
+        }
+    }
+
+    public function stringArg(Node $value): ?string
+    {
+        if ($value instanceof Node\Scalar\String_) {
+            return $value->value;
+        } elseif ($value instanceof Node\Expr\BinaryOp\Concat) {
+            return $this->stringFromConcat($value);
+        } else {
+            return null;
+        }
+    }
+
     public function enterNode(Node $expr)
     {
         if ($expr instanceof Node\Expr\StaticCall
@@ -103,11 +147,12 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'gettext':
                 case '_':
                     // arguments: 1
-                    if ($expr->args[0]->value instanceof Node\Scalar\String_) {
+                    $msgid = $this->stringArg($expr->args[0]->value);
+                    if (null !== $msgid) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgid' => $expr->args[0]->value->value,
+                            'msgid' => $msgid,
                             'msgstr' => '',
                         ]);
                     }
@@ -115,44 +160,44 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'nget':
                 case 'ngettext':
                     // arguments: 1,2
-                    if ($expr->args[0]->value instanceof Node\Scalar\String_
-                        and $expr->args[1]->value instanceof Node\Scalar\String_
-                    ) {
+                    $msgid = $this->stringArg($expr->args[0]->value);
+                    $msg_plural = $this->stringArg($expr->args[1]->value);
+                    if (null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgid' => $expr->args[0]->value->value,
-                            'msgid_plural' => $expr->args[1]->value->value,
+                            'msgid' => $msgid,
+                            'msgid_plural' => $msg_plural,
                             'msgstr' => ['', ''],
                         ]);
                     }
                     break;
                 case 'pget':
                     // arguments: 1c,2
-                    if ($expr->args[0]->value instanceof Node\Scalar\String_
-                        and $expr->args[1]->value instanceof Node\Scalar\String_
-                    ) {
+                    $msgctxt = $this->stringArg($expr->args[0]->value);
+                    $msgid = $this->stringArg($expr->args[1]->value);
+                    if (null !== $msgctxt and null !== $msgid) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgctxt' => $expr->args[0]->value->value,
-                            'msgid' => $expr->args[1]->value->value,
+                            'msgctxt' => $msgctxt,
+                            'msgid' => $msgid,
                             'msgstr' => '',
                         ]);
                     }
                     break;
                 case 'npget':
                     // arguments: 1c,2,3
-                    if ($expr->args[0]->value instanceof Node\Scalar\String_
-                        and $expr->args[1]->value instanceof Node\Scalar\String_
-                        and $expr->args[2]->value instanceof Node\Scalar\String_
-                    ) {
+                    $msgctxt = $this->stringArg($expr->args[0]->value);
+                    $msgid = $this->stringArg($expr->args[1]->value);
+                    $msg_plural = $this->stringArg($expr->args[2]->value);
+                    if (null !== $msgctxt and null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgctxt' => $expr->args[0]->value->value,
-                            'msgid' => $expr->args[1]->value->value,
-                            'msgid_plural' => $expr->args[2]->value->value,
+                            'msgctxt' => $msgctxt,
+                            'msgid' => $msgid,
+                            'msgid_plural' => $msg_plural,
                             'msgstr' => ['', ''],
                         ]);
                     }
@@ -160,11 +205,12 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'dgettext':
                 case 'dcgettext':
                     // arguments: 2
-                    if ($expr->args[1]->value instanceof Node\Scalar\String_) {
+                    $msgid = $this->stringArg($expr->args[1]->value);
+                    if (null !== $msgid) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgid' => $expr->args[1]->value->value,
+                            'msgid' => $msgid,
                             'msgstr' => '',
                         ]);
                     }
@@ -172,14 +218,14 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'dngettext':
                 case 'dcngettext':
                     // arguments: 2,3
-                    if ($expr->args[1]->value instanceof Node\Scalar\String_
-                        and $expr->args[2]->value instanceof Node\Scalar\String_
-                    ) {
+                    $msgid = $this->stringArg($expr->args[1]->value);
+                    $msg_plural = $this->stringArg($expr->args[2]->value);
+                    if (null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
                             '#.' => $comments,
                             '#:' => $src,
-                            'msgid' => $expr->args[1]->value->value,
-                            'msgid_plural' => $expr->args[2]->value->value,
+                            'msgid' => $msgid,
+                            'msgid_plural' => $msg_plural,
                             'msgstr' => ['', ''],
                         ]);
                     }
