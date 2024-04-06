@@ -27,7 +27,9 @@ Simple messages are maintained via the `_()` method, plural forms and contexts a
 > weighted, or at least, appear to be so, when looking at program sources.
 
 - no need to use constants or other intermediate constructs replacing messages in source code;
-- handling of plural forms and context-based translations;
+- handling of plural forms;
+- handling of context-aware functions (`pgettext` family) that are currently missing from php extension;
+- no need to install additional locales on target OS or setting environment variables;
 - standard translation process based on PO files; multitude of editors or processes may be used;
 - translations are stored in `.php` files which allows for a quick autoloading and opcode caching, minimized runtime
   effort to get translation into memory and finding translation for source string;
@@ -520,12 +522,12 @@ For detailed discussion see [gettext manual](https://www.gnu.org/software/gettex
 
 ## Class methods replacement for gettext functions
 
-| `gettext` function | `Text` method |
-|--------------------|---------------|
-| `_()`, `gettext()` | `_()`         |
-| `ngettext()`       | `nget()`      |
-| `pgettext()`       | `pget()`      |
-| `npgettext()`      | `npget()`     |
+| `gettext` function                  | `Text` method |
+|-------------------------------------|---------------|
+| `_()`, `gettext()`                  | `_()`         |
+| `ngettext()`                        | `nget()`      |
+| context-aware (`pgettext` in C API) | `pget()`      |
+| `npgettext()`                       | `npget()`     |
 
 Note the lack of domain functions (`dgettext`, ...) Domains in gettext are represented by different translation files,
 so to use a translation from another domain one should instantiate another `Text` object.
@@ -547,6 +549,8 @@ Example:
   echo $myDomain->_("Welcome to My PHP Application"), "\n";
   echo $anotherDomain->_("Welcome to Another PHP Application"), "\n";
   ```
+
+Also, context-aware functions (`pgettext` family) are missing from bundled PHP gettext extension.
 
 ## Resources
 
