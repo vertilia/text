@@ -8,6 +8,10 @@ class PoDomain
     protected array $messages = [];
     protected ?string $comment_tag;
 
+    // regex to detect a php sprintf string, we only exclude the space flag
+    // because that is the default and the most likely to raise false positives
+    //                            %|argnum$|flags_|w_|precision___|specifier________
+    private string $fmt_regex = '/%(\d+\$)?[+0#-]*\d*(\.\d+|\.\*)?[bcdeEfFgGhHosuxX]/';
 
     public function __construct(?string $comment_tag = null, int $line_length = 80)
     {
@@ -30,7 +34,7 @@ class PoDomain
         );
 
         // add php-format flag if needed
-        if (false !== strpos($msguid, '%')) {
+        if (preg_match($this->fmt_regex, $msguid)) {
             $flag = 'php-format';
             if (isset($msg['#,'])) {
                 if (false === strpos($msg['#,'], $flag)) {

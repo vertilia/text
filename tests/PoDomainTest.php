@@ -66,6 +66,24 @@ print_r("$po");
                     'TRAD:',
                     ['msgid' => 'An apple', '#.' => ['/*** TRAD: comment1 */', '/// comment2', '### comment3']]
                 ],
+            'POT with complex float sprintf' =>
+                [
+                    '/#, php-format\s+msgid "%0.2f apple/',
+                    '',
+                    ['msgid' => '%0.2f apple']
+                ],
+            'POT with complex string sprintf' =>
+                [
+                    '/#, php-format\s+msgid "%-200s apple/',
+                    '',
+                    ['msgid' => '%-200s apple']
+                ],
+            'POT with non-sprintf %' =>
+                [
+                    '/msgid "% of an apple is 100%, not 90% orange/',
+                    '',
+                    ['msgid' => '% of an apple is 100%, not 90% orange']
+                ],
         ];
     }
 }
