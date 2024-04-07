@@ -15,10 +15,10 @@
     }
   },
   "require": {
-    "php": ">=7.4"
+    "php": ">=7.4",
+    "nikic/php-parser": "^5"
   },
   "require-dev": {
-    "nikic/php-parser": "*",
     "phpunit/phpunit": "^9"
   },
   "bin": [
