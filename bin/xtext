@@ -77,6 +77,8 @@ class Php2PoVisitor extends NodeVisitorAbstract
 {
     protected PoDomain $po_file;
     private string $src_file;
+    private array $last_comments = [];
+    private int $last_comments_line = 0;
 
     public function __construct(PoDomain $po_file, string $src_file)
     {
@@ -132,6 +134,17 @@ class Php2PoVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
+        $last_comments = $node->getAttribute('comments');
+        if ($last_comments) {
+            $last = end($last_comments);
+            $last_comments_line = $last->getEndLine();
+            $this->last_comments = $last_comments;
+            $this->last_comments_line = $last_comments_line;
+        } else {
+            $last_comments = $this->last_comments;
+            $last_comments_line = $this->last_comments_line;
+        }
+
         if ($node instanceof Node\Expr\StaticCall
             or $node instanceof Node\Expr\MethodCall
             or $node instanceof Node\Expr\FuncCall
@@ -143,16 +156,20 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 $fn = $node->name;
             }
 
+            if (empty($last_comments_line) or $last_comments_line < $node->getStartLine() - 1) {
+                $last_comments = [];
+            }
+
             $src = $this->src_file . ':' . $node->getAttribute('startLine');
-            $comments = $node->getAttribute('comments');
             switch ($fn) {
                 case 'gettext':
                 case '_':
                     // arguments: 1
                     $msgid = $this->stringArg($node->args[0]->value);
+                    $comment1 = $node->args[0]->getAttribute('comments') ?: [];
                     if (null !== $msgid) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1),
                             '#:' => $src,
                             'msgid' => $msgid,
                             'msgstr' => '',
@@ -163,10 +180,12 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'ngettext':
                     // arguments: 1,2
                     $msgid = $this->stringArg($node->args[0]->value);
+                    $comment1 = $node->args[0]->getAttribute('comments') ?: [];
                     $msg_plural = $this->stringArg($node->args[1]->value);
+                    $comment2 = $node->args[1]->getAttribute('comments') ?: [];
                     if (null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1, $comment2),
                             '#:' => $src,
                             'msgid' => $msgid,
                             'msgid_plural' => $msg_plural,
@@ -175,12 +194,14 @@ class Php2PoVisitor extends NodeVisitorAbstract
                     }
                     break;
                 case 'pget':
+                case 'pgettext':
                     // arguments: 1c,2
                     $msgctxt = $this->stringArg($node->args[0]->value);
                     $msgid = $this->stringArg($node->args[1]->value);
+                    $comment1 = $node->args[1]->getAttribute('comments') ?: [];
                     if (null !== $msgctxt and null !== $msgid) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1),
                             '#:' => $src,
                             'msgctxt' => $msgctxt,
                             'msgid' => $msgid,
@@ -189,13 +210,16 @@ class Php2PoVisitor extends NodeVisitorAbstract
                     }
                     break;
                 case 'npget':
+                case 'npgettext':
                     // arguments: 1c,2,3
                     $msgctxt = $this->stringArg($node->args[0]->value);
                     $msgid = $this->stringArg($node->args[1]->value);
+                    $comment1 = $node->args[1]->getAttribute('comments') ?: [];
                     $msg_plural = $this->stringArg($node->args[2]->value);
+                    $comment2 = $node->args[2]->getAttribute('comments') ?: [];
                     if (null !== $msgctxt and null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1, $comment2),
                             '#:' => $src,
                             'msgctxt' => $msgctxt,
                             'msgid' => $msgid,
@@ -208,9 +232,10 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'dcgettext':
                     // arguments: 2
                     $msgid = $this->stringArg($node->args[1]->value);
+                    $comment1 = $node->args[1]->getAttribute('comments') ?: [];
                     if (null !== $msgid) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1),
                             '#:' => $src,
                             'msgid' => $msgid,
                             'msgstr' => '',
@@ -221,10 +246,12 @@ class Php2PoVisitor extends NodeVisitorAbstract
                 case 'dcngettext':
                     // arguments: 2,3
                     $msgid = $this->stringArg($node->args[1]->value);
+                    $comment1 = $node->args[1]->getAttribute('comments') ?: [];
                     $msg_plural = $this->stringArg($node->args[2]->value);
+                    $comment2 = $node->args[2]->getAttribute('comments') ?: [];
                     if (null !== $msgid and null !== $msg_plural) {
                         $this->po_file->addMsg([
-                            '#.' => $comments,
+                            '#.' => array_merge($last_comments, $comment1, $comment2),
                             '#:' => $src,
                             'msgid' => $msgid,
                             'msgid_plural' => $msg_plural,
@@ -232,6 +259,13 @@ class Php2PoVisitor extends NodeVisitorAbstract
                         ]);
                     }
                     break;
+                default:
+                    $msgid = null;
+            }
+
+            if ($msgid) {
+                $this->last_comments = [];
+                $this->last_comments_line = 0;
             }
         }
     }
