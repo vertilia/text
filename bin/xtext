@@ -175,6 +175,7 @@ class Php2PoVisitor extends NodeVisitorAbstract
                     }
                     break;
                 case 'pget':
+                case 'pgettext':
                     // arguments: 1c,2
                     $msgctxt = $this->stringArg($node->args[0]->value);
                     $msgid = $this->stringArg($node->args[1]->value);

@@ -550,7 +550,8 @@ Example:
   echo $anotherDomain->_("Welcome to Another PHP Application"), "\n";
   ```
 
-Also, context-aware functions (`pgettext` family) are missing from bundled PHP gettext extension.
+Also, while context-aware functions (`pgettext` family) are missing from bundled PHP gettext extension,
+`xtext` will extract strings from similarly-named functions when possible.
 
 ## Resources
 
