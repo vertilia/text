@@ -107,8 +107,23 @@ class PoDomain
         }
     }
 
+    public static function compareMessages($a, $b)
+    {
+        return strnatcmp($a['sortby'] ?? "", $b['sortby'] ?? "");
+    }
+
     public function __toString(): string
     {
+        // sort reference array and create our sorting value
+        foreach ($this->messages as &$msg) {
+            if (isset($msg['#:'])) {
+                natsort($msg['#:']);
+                $msg["sortby"] = join(" ", $msg['#:']);
+            }
+        }
+        // sort messages by the sorting value
+        uasort($this->messages, [PoDomain::class, "compareMessages"]);
+
         // add header if not set
         if (!isset($this->messages[0])) {
             array_unshift(
